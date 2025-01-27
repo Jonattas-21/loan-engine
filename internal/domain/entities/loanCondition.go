@@ -1,8 +1,14 @@
 package entities
 
+import (
+	"math/big"
+	"time"
+)
+
 type LoanCondition struct {
-	Name string `json:"name"`
-	InterestRate int64 `json:"interest_rate"`
-	MinAge int64 `json:"min_age"`
-	MaxAge int64 `json:"max_age"`
+	Name         string    `json:"name"`
+	InterestRate big.Float `json:"interest_rate"`
+	MinAge       int       `json:"min_age"`
+	MaxAge       int       `json:"max_age"`
+	ModifiedDate time.Time `json:"modified_date"`
 }
