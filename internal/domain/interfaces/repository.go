@@ -1,6 +1,8 @@
 package interfaces
 
-type Repository interface {
-    SaveCollection[T any](itemToSave T) error
-    GetItemCollection[T any](itemToGet T) ([]T, error)
+type Repository[T any] interface {
+	SaveItemCollection(itemToSave T) error
+	GetItemsCollection(collectionKey string) ([]T, error)
+	DeleteItemCollection(collectionItemKey string) error
+	UpdateItemCollection(collectionItemKey string, fields map[string]interface{}) error
 }

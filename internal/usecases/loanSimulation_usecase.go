@@ -11,17 +11,17 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
 )
 
-type Loan interface {
+type LoanSimulation interface {
 	GetLoanSimulation(SimulationRequests [] dto.SimulationRequest_dto) ([] entities.LoanCondition, error)
 	CalculateLoan(SimulationRequest dto.SimulationRequest_dto) (entities.LoanCondition, error)
 }
 
-type Loan_usecase struct {
-	LoanRepository interfaces.Repository
+type LoanSimulation_usecase struct {
+	LoanSimulationRepository interfaces.Repository[entities.LoanSimulation]
 	LoanCondition  LoanCondition
 }
 
-func (l *Loan_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanSimulation, error) {
+func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanSimulation, error) {
 
 	var simulationResponses []entities.LoanSimulation
 
@@ -30,7 +30,7 @@ func (l *Loan_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequ
 	for _, SimulationRequest := range SimulationRequests {
 		simulationResponse, err := l.CalculateLoan(SimulationRequest)
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("Error calculating loan, ", err.Error()))
+			return nil, errors.New(fmt.Sprintf("Error calculating loan, %v", err.Error()))
 		}
 		simulationResponses = append(simulationResponses, simulationResponse)
 	}
@@ -38,12 +38,12 @@ func (l *Loan_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequ
 	return simulationResponses, nil
 }
 
-func (l *Loan_usecase) CalculateLoan(SimulationRequest dto.SimulationRequest_dto) (entities.LoanSimulation, error) {
+func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationRequest_dto) (entities.LoanSimulation, error) {
 
 	//get fee conditions
 	conditions, err := l.LoanCondition.GetLoanConditions()
 	if err != nil {
-		return entities.LoanSimulation{}, errors.New(fmt.Sprintf("Error getting loan conditions, ", err.Error()))
+		return entities.LoanSimulation{}, errors.New(fmt.Sprintf("Error getting loan conditions, %v", err.Error()))
 	}
 
 	//calculate age
@@ -94,7 +94,7 @@ func (l *Loan_usecase) CalculateLoan(SimulationRequest dto.SimulationRequest_dto
 	}, nil
 }
 
-func (l *Loan_usecase) calculatePower(base *big.Float, exponent int) *big.Float {
+func (l *LoanSimulation_usecase) calculatePower(base *big.Float, exponent int) *big.Float {
 	result := big.NewFloat(1)
 	for i := 0; i < exponent; i++ {
 		result.Mul(result, base)
@@ -102,7 +102,7 @@ func (l *Loan_usecase) calculatePower(base *big.Float, exponent int) *big.Float 
 	return result
 }
 
-func (l *Loan_usecase) createInstallments(SimulationRequest dto.SimulationRequest_dto, InstallmentValue *big.Float, loanSimulation entities.LoanSimulation, AmountTobePaid big.Float) {
+func (l *LoanSimulation_usecase) createInstallments(SimulationRequest dto.SimulationRequest_dto, InstallmentValue *big.Float, loanSimulation entities.LoanSimulation, AmountTobePaid big.Float) {
 	for i := 0; i < SimulationRequest.Installments; i++ {
 		installment := entities.Installment{
 			InstallmentNumber:    i + 1,
