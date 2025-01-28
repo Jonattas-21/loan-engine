@@ -12,6 +12,7 @@ import (
 	"os"
 
 	"github.com/Jonattas-21/loan-engine/internal/api/handlers"
+	"github.com/Jonattas-21/loan-engine/internal/api/middlewares"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	//"github.com/Jonattas-21/loan-engine/internal/infrastructure/cache"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/database"
@@ -27,7 +28,7 @@ func main() {
 		panic(err) //todo: search for panic
 	}
 
-	//useAuth := os.Getenv("USE_AUTH")
+	useAuth := os.Getenv("USE_SECURITY")
 
 	//Creating the router
 	router := chi.NewRouter()
@@ -68,22 +69,26 @@ func main() {
 		LoanCondition_usecase: &loanCondition_usecase,
 	}
 	loanSimulation_handler := handlers.LoanSimulationHandler{
-		LoanSimulation_usecase: &loanSimulation_usecase,
-		
+		LoanSimulation_usecase: loanSimulation_usecase,
 	}
 
+	//Defining the routes
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Get("/", dafault_handler.HealthCheck)
 
 	router.Route("/loanconditions", func(r chi.Router) {
-		//auth
-		r.Post("/", loanCondition_handler.SetLoanConditions)
+		if useAuth == "true" {
+			r.Use(middlewares.Auth)
+		}
+		r.Post("/", loanCondition_handler.SetLoanCondition)
 		r.Get("/", loanCondition_handler.GetLoanConditions)
 	})
 
 	router.Route("/loansimulations", func(r chi.Router) {
-		//auth
+		if useAuth == "true" {
+			r.Use(middlewares.Auth)
+		}
 		r.Get("/", loanSimulation_handler.GetLoanSimulation)
 	})
 

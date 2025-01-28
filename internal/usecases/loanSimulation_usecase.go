@@ -1,37 +1,56 @@
 package usecases
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"time"
 
-	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
+	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
 )
 
 type LoanSimulation interface {
-	GetLoanSimulation(SimulationRequests [] dto.SimulationRequest_dto) ([] entities.LoanCondition, error)
+	GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanCondition, error)
 	CalculateLoan(SimulationRequest dto.SimulationRequest_dto) (entities.LoanCondition, error)
 }
 
 type LoanSimulation_usecase struct {
 	LoanSimulationRepository interfaces.Repository[entities.LoanSimulation]
-	LoanCondition  LoanCondition
+	CacheRepository          interfaces.CacheRepository
+	LoanCondition            LoanCondition
 }
 
 func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanSimulation, error) {
 
 	var simulationResponses []entities.LoanSimulation
+	var loanSimulation entities.LoanSimulation
 
 	//loop through all simulation requests
 	//todo async
-	for _, SimulationRequest := range SimulationRequests {
-		simulationResponse, err := l.CalculateLoan(SimulationRequest)
+	for _, simulationRequest := range SimulationRequests {
+
+		//check if the request is in cache
+		value, err := l.CacheRepository.Get(simulationRequest.Email)
+		if err == nil {
+			err = json.Unmarshal([]byte(value.(string)), &loanSimulation)
+			if err != nil {
+				log.Println(fmt.Sprintf("Error unmarshalling loan simulation from cache from email: %v ", simulationRequest.Email), err.Error())
+			}
+			simulationResponses = append(simulationResponses, loanSimulation)
+			continue
+		}
+
+		//calculate loan if not in cache
+		simulationResponse, err := l.CalculateLoan(simulationRequest)
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Error calculating loan, %v", err.Error()))
 		}
+		l.CacheRepository.Set(simulationResponse.Email, simulationRequest, time.Second*5)
+
 		simulationResponses = append(simulationResponses, simulationResponse)
 	}
 
@@ -91,6 +110,7 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 		AmountFeeTobePaid: AmountTobePaid,
 		SimulationDate:    time.Now(),
 		Currency:          SimulationRequest.Currency,
+		Email:             SimulationRequest.Email,
 	}, nil
 }
 

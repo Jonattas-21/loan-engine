@@ -2,9 +2,11 @@ package usecases
 
 import (
 	"log"
+	"time"
 
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
+	"encoding/json"
 )
 
 type LoanCondition interface {
@@ -14,9 +16,10 @@ type LoanCondition interface {
 
 type LoanCondition_usecase struct {
 	LoanConditionRepository interfaces.Repository[entities.LoanCondition]
+	CacheRepository         interfaces.CacheRepository
 }
 
-func (l *LoanCondition_usecase) SetLoanConditions(LoanCondition entities.LoanCondition) error {
+func (l *LoanCondition_usecase) SetLoanCondition(LoanCondition entities.LoanCondition) error {
 	fieldsFrom := make(map[string]interface{})
 	fieldsFrom["name"] = LoanCondition.Name
 	fieldsFrom["InterestRate"] = LoanCondition.InterestRate
@@ -33,7 +36,19 @@ func (l *LoanCondition_usecase) SetLoanConditions(LoanCondition entities.LoanCon
 }
 
 func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, error) {
+	loanConditions := []entities.LoanCondition{}
+	val, err:= l.CacheRepository.Get("*")
+	if err == nil {
+		err = json.Unmarshal([]byte(val.(string)), &loanConditions)
+		if err != nil {
+			log.Println("Error unmarshalling loan conditions from cache: ", err.Error())
+		}
+		return loanConditions, nil
+	}
+
 	conditions, err := l.LoanConditionRepository.GetItemsCollection("")
+	l.CacheRepository.Set("*", conditions, time.Second * 10)
+
 	if err != nil {
 		log.Println("Error getting loan conditions: ", err.Error())
 		return nil, err
