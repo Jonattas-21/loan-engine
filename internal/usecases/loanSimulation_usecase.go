@@ -1,9 +1,11 @@
 package usecases
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html/template"
 	"log"
 	"math/big"
 	"time"
@@ -21,6 +23,7 @@ type LoanSimulation interface {
 type LoanSimulation_usecase struct {
 	LoanSimulationRepository interfaces.Repository[entities.LoanSimulation]
 	CacheRepository          interfaces.CacheRepository
+	EmailSender              interfaces.EmailSender
 	LoanCondition            LoanCondition
 }
 
@@ -39,9 +42,17 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			err = json.Unmarshal([]byte(value.(string)), &loanSimulation)
 			if err != nil {
 				log.Println(fmt.Sprintf("Error unmarshalling loan simulation from cache from email: %v ", simulationRequest.Email), err.Error())
+			} else {
+				//send email
+				message, err := l.formatEmailMessage(loanSimulation)
+				if err == nil {
+					//the error it's been logged before, but the process should continue
+					l.EmailSender.SendMail(fmt.Sprintf("Loan simulation %v", time.Now().Format("2006-01-02 15:04:05")), message, loanSimulation.Email)
+				}
+				simulationResponses = append(simulationResponses, loanSimulation)
+
+				continue
 			}
-			simulationResponses = append(simulationResponses, loanSimulation)
-			continue
 		}
 
 		//calculate loan if not in cache
@@ -50,7 +61,6 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			return nil, errors.New(fmt.Sprintf("Error calculating loan, %v", err.Error()))
 		}
 		l.CacheRepository.Set(simulationResponse.Email, simulationRequest, time.Second*5)
-
 		simulationResponses = append(simulationResponses, simulationResponse)
 	}
 
@@ -122,15 +132,33 @@ func (l *LoanSimulation_usecase) calculatePower(base *big.Float, exponent int) *
 	return result
 }
 
-func (l *LoanSimulation_usecase) createInstallments(SimulationRequest dto.SimulationRequest_dto, InstallmentValue *big.Float, loanSimulation entities.LoanSimulation, AmountTobePaid big.Float) {
-	for i := 0; i < SimulationRequest.Installments; i++ {
+func (l *LoanSimulation_usecase) createInstallments(simulationRequest dto.SimulationRequest_dto, installmentValue *big.Float, loanSimulation entities.LoanSimulation, amountTobePaid big.Float) {
+	for i := 0; i < simulationRequest.Installments; i++ {
 		installment := entities.Installment{
 			InstallmentNumber:    i + 1,
-			InstallmentAmount:    *InstallmentValue,
-			InstallmentFeeAmount: *InstallmentValue,
-			Currency:             SimulationRequest.Currency,
+			InstallmentAmount:    *installmentValue,
+			InstallmentFeeAmount: *installmentValue,
+			Currency:             simulationRequest.Currency,
 		}
 		loanSimulation.Installments = append(loanSimulation.Installments, installment)
-		AmountTobePaid.Add(&AmountTobePaid, InstallmentValue)
+		amountTobePaid.Add(&amountTobePaid, installmentValue)
 	}
+}
+
+func (l *LoanSimulation_usecase) formatEmailMessage(loanSimulation entities.LoanSimulation) (string, error) {
+	// Read the template file
+	tmpl, err := template.ParseFiles("internal/infrastructure/email/templates/sendLoanSimulation.html") //could be readed on init, one time.
+	if err != nil {
+		log.Println(fmt.Sprintf("Error reading email template, %v", err.Error()))
+		return "", errors.New(fmt.Sprintf("Error reading email template, %v", err.Error()))
+	}
+
+	// Generate the HTML content
+	var htmlContent bytes.Buffer
+	err = tmpl.Execute(&htmlContent, loanSimulation)
+	if err != nil {
+		log.Println(fmt.Sprintf("Error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email))
+	}
+
+	return htmlContent.String(), nil
 }

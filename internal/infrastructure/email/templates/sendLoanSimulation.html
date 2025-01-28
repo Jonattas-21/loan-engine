@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loan Simulation</title>
+</head>
+<body>
+    <h1>Loan Simulation</h1>
+    <p><strong>Amount to be Paid:</strong> {{.AmountTobePaid.String}}</p>
+    <p><strong>Amount Fee to be Paid:</strong> {{.AmountFeeTobePaid.String}}</p>
+    <p><strong>Simulation Date:</strong> {{.SimulationDate}}</p>
+    <p><strong>Currency:</strong> {{.Currency}}</p>
+    <p><strong>Email:</strong> {{.Email}}</p>
+    <h2>Installments:</h2>
+    <ul>
+        {{range .Installments}}
+        <li>
+            <strong>Installment Number:</strong> {{.InstallmentNumber}}<br>
+            <strong>Installment Amount:</strong> {{.InstallmentAmount.String}}<br>
+            <strong>Installment Fee Amount:</strong> {{.InstallmentFeeAmount.String}}<br>
+            <strong>Currency:</strong> {{.Currency}}
+        </li>
+        {{end}}
+    </ul>
+</body>
+</html>

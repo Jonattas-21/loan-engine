@@ -14,14 +14,15 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/api/handlers"
 	"github.com/Jonattas-21/loan-engine/internal/api/middlewares"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
-	//"github.com/Jonattas-21/loan-engine/internal/infrastructure/cache"
+	"github.com/Jonattas-21/loan-engine/internal/infrastructure/cache"
+		"github.com/Jonattas-21/loan-engine/internal/infrastructure/email"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/database"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/repositories"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
 )
 
 func main() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("cmd/.env")
 
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -49,18 +50,25 @@ func main() {
 	dbName := os.Getenv("MONGO_DB")
 
 	//Conect to Redis cache
-	//rdb := cache.NewCache()
+	rdb := cache.NewCache()
+	cacheRepo := &repositories.RedisRepository{Redis: rdb}
 
-	//Creating the usecases
+
+	//Creating the condition usecase
 	repoLoanCondition := &repositories.DefaultRepository[entities.LoanCondition]{Client: mdb, DatabaseName: dbName, CollectionName: "loan-conditions"}
 	loanCondition_usecase := usecases.LoanCondition_usecase{
 		LoanConditionRepository: repoLoanCondition,
+		CacheRepository:      cacheRepo,
 	}
 
+	//Creating the simulation usecase
 	repoLoanSimulation := &repositories.DefaultRepository[entities.LoanSimulation]{Client: mdb, DatabaseName: dbName, CollectionName: "loan-simulations"}
+	emailSender := email.EmailSender{}
 	loanSimulation_usecase := usecases.LoanSimulation_usecase{
 		LoanCondition:            &loanCondition_usecase,
 		LoanSimulationRepository: repoLoanSimulation,
+		CacheRepository:      cacheRepo,
+		EmailSender: 			&emailSender,
 	}
 
 	//Creating the handlers

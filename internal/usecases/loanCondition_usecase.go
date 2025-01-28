@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
+	"encoding/json"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
-	"encoding/json"
 )
 
 type LoanCondition interface {
@@ -37,7 +37,7 @@ func (l *LoanCondition_usecase) SetLoanCondition(LoanCondition entities.LoanCond
 
 func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, error) {
 	loanConditions := []entities.LoanCondition{}
-	val, err:= l.CacheRepository.Get("*")
+	val, err := l.CacheRepository.Get("*")
 	if err == nil {
 		err = json.Unmarshal([]byte(val.(string)), &loanConditions)
 		if err != nil {
@@ -47,7 +47,7 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 	}
 
 	conditions, err := l.LoanConditionRepository.GetItemsCollection("")
-	l.CacheRepository.Set("*", conditions, time.Second * 10)
+	l.CacheRepository.Set("*", conditions, time.Second*10)
 
 	if err != nil {
 		log.Println("Error getting loan conditions: ", err.Error())
