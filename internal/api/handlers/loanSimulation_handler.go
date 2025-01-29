@@ -37,5 +37,5 @@ func (h *LoanSimulationHandler) GetLoanSimulation(w http.ResponseWriter, r *http
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 }

@@ -59,5 +59,6 @@ func (h *LoanConditionHandler) GetLoanConditions(w http.ResponseWriter, r *http.
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	
 	w.WriteHeader(http.StatusOK)
 }

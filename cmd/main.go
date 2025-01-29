@@ -53,12 +53,18 @@ func main() {
 	rdb := cache.NewCache()
 	cacheRepo := &repositories.RedisRepository{Redis: rdb}
 
-
 	//Creating the condition usecase
 	repoLoanCondition := &repositories.DefaultRepository[entities.LoanCondition]{Client: mdb, DatabaseName: dbName, CollectionName: "loan-conditions"}
 	loanCondition_usecase := usecases.LoanCondition_usecase{
 		LoanConditionRepository: repoLoanCondition,
 		CacheRepository:      cacheRepo,
+	}
+
+	//Init the loan conditions tiers
+	err= loanCondition_usecase.InitLoanEngineConditionsData()
+	if err != nil {
+		log.Fatal("Error initializing loan conditions: ", err.Error())
+		panic(err)
 	}
 
 	//Creating the simulation usecase

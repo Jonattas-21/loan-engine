@@ -15,9 +15,9 @@ func NewDatabase() *mongo.Client {
 	host := os.Getenv("MONGO_HOST")
 	clientOptions := options.Client().ApplyURI(host)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10* time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	
+
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal("Error connecting to the database")
@@ -25,4 +25,15 @@ func NewDatabase() *mongo.Client {
 	}
 
 	return client
+}
+
+func CloseDatabase(client *mongo.Client) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := client.Disconnect(ctx)
+	if err != nil {
+		log.Fatal("Error disconnecting from the database")
+		panic(err)
+	}
 }

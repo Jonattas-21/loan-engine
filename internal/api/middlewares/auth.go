@@ -9,8 +9,9 @@ import (
 )
 
 type ValidationFunc func(token string, ctx context.Context) (string, error)
-
+type contextKey string
 var ValidateToken ValidationFunc = auth.ValidationToken
+const userKey contextKey = "user"
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +30,7 @@ func Auth(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "email", email)
+		ctx := context.WithValue(r.Context(), userKey, email)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

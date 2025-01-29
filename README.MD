@@ -4,7 +4,8 @@ This project It's a credit simulator which allows users to consult loan conditio
 
 ## Features
 
-- Credit simultor
+- Loan simultor
+- Loan conditions update
 
 ## Technical Componentes
 
@@ -18,4 +19,4 @@ This project It's a credit simulator which allows users to consult loan conditio
 
 ## Instalation
 
-
+go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest

@@ -1,6 +1,9 @@
 build:
 	@go build ./cmd/.
 	@echo services were built!
+	@golangci-lint run
+	@echo linter passed!
+
 
 run: build
 	@go run ./cmd/main.go
