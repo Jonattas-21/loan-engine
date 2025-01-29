@@ -20,17 +20,17 @@ func (d *DefaultHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	err := d.MongoRepo.Ping()
 	message += "MongoDB said:\n"
 	if err != nil {
-		message += fmt.Sprintf("Error during ping in DB: %v\n", err.Error())
+		message += fmt.Sprintf("- I got an error during ping in DB: %v\n", err.Error())
 	} else {
-		message += fmt.Sprintf("MongoDB is alive now %v!\n", time.Now().Format("2006-01-02 15:04:05"))
+		message += fmt.Sprintf("- I'm alive now %v!\n", time.Now().Format("2006-01-02 15:04:05"))
 	}
 
 	err = d.CacheRepository.Ping()
 	message += "RedisCache said:\n"
 	if err != nil {
-		message += fmt.Sprintf("Error during ping in Cache: %v\n", err.Error())
+		message += fmt.Sprintf("- I got an error during ping in Cache: %v\n", err.Error())
 	} else {
-		message += fmt.Sprintf("Cache is alive now %v!\n", time.Now().Format("2006-01-02 15:04:05"))
+		message += fmt.Sprintf("- I'm alive now %v!\n", time.Now().Format("2006-01-02 15:04:05"))
 	}
 
 	_, err = w.Write([]byte(message))

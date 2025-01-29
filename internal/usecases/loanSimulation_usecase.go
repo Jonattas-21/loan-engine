@@ -94,7 +94,7 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 	var interestRate big.Float
 	for _, condition := range conditions {
 		if condition.MinAge >= age && condition.MaxAge < age {
-			interestRate = condition.InterestRate
+			interestRate = *big.NewFloat(condition.InterestRate)
 		}
 	}
 
@@ -120,10 +120,10 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 	var AmountTobePaid big.Float
 
 	l.createInstallments(SimulationRequest, InstallmentValue, loanSimulation, AmountTobePaid)
-
+	amountTobePaid, _:= AmountTobePaid.Float64()
 	return entities.LoanSimulation{
-		AmountTobePaid:    AmountTobePaid,
-		AmountFeeTobePaid: AmountTobePaid,
+		AmountTobePaid:    amountTobePaid,
+		AmountFeeTobePaid: amountTobePaid, //todo calculate fee
 		SimulationDate:    time.Now(),
 		Currency:          SimulationRequest.Currency,
 		Email:             SimulationRequest.Email,
@@ -140,10 +140,11 @@ func (l *LoanSimulation_usecase) calculatePower(base *big.Float, exponent int) *
 
 func (l *LoanSimulation_usecase) createInstallments(simulationRequest dto.SimulationRequest_dto, installmentValue *big.Float, loanSimulation entities.LoanSimulation, amountTobePaid big.Float) {
 	for i := 0; i < simulationRequest.Installments; i++ {
+		installmentValueFloat, _ := installmentValue.Float64()
 		installment := entities.Installment{
 			InstallmentNumber:    i + 1,
-			InstallmentAmount:    *installmentValue,
-			InstallmentFeeAmount: *installmentValue,
+			InstallmentAmount:    installmentValueFloat,
+			InstallmentFeeAmount: installmentValueFloat,
 			Currency:             simulationRequest.Currency,
 		}
 		loanSimulation.Installments = append(loanSimulation.Installments, installment)

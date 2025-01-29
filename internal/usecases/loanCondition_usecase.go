@@ -3,7 +3,6 @@ package usecases
 import (
 	"fmt"
 	"log"
-	"math/big"
 	"time"
 
 	"encoding/json"
@@ -49,17 +48,23 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 		return loanConditions, nil
 	}
 
-	conditions, err := l.LoanConditionRepository.GetItemsCollection("")
+	conditions, err := l.LoanConditionRepository.GetItemsCollection("loan-conditions")
+	log.Printf("Conditions: %v", conditions)
 	if err != nil {
 		log.Println("Error getting loan conditions: ", err.Error())
-		return nil, fmt.Errorf("Error getting loan conditions: %w", err)
+		return nil, fmt.Errorf("Error getting loan conditions from mongoDB: %w", err)
 	}
 
 	if len(conditions) > 0 {
-		err = l.CacheRepository.Set("*", conditions, time.Second*10)
+		jsonConditions, err := json.Marshal(conditions)
+		// Save in cache, if not, let's just log the error and continue
 		if err != nil {
-			log.Println("Error setting loan conditions in cache: ", err.Error())
-			return nil, fmt.Errorf("Error setting loan conditions in cache: %w", err)
+			log.Println("Error marshalling loan conditions: ", err.Error())
+		} else {
+			err = l.CacheRepository.Set("loan-conditions", jsonConditions, time.Second*10)
+			if err != nil {
+				log.Println("Error setting loan conditions in cache: ", err.Error())
+			}
 		}
 	}
 
@@ -67,11 +72,19 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 }
 
 func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
-	err := l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
+
+	err := l.LoanConditionRepository.TrunkCollection()
+	if err != nil {
+		log.Println("Error truncating loan conditions collection: ", err.Error())
+		return fmt.Errorf("Error truncating loan conditions collection: %w", err)
+	}
+
+	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
 		Name:         "tier1",
-		InterestRate: *big.NewFloat(5),
+		InterestRate: 5,
 		MinAge:       18,
 		MaxAge:       25,
+		ModifiedDate: time.Now(),
 	})
 	if err != nil {
 		log.Println("Error saving default loan condition for tier 1:", err.Error())
@@ -80,9 +93,10 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
 		Name:         "tier2",
-		InterestRate: *big.NewFloat(3),
+		InterestRate: 3,
 		MinAge:       26,
 		MaxAge:       40,
+		ModifiedDate: time.Now(),
 	})
 	if err != nil {
 		log.Println("Error saving default loan condition for tier 2:", err.Error())
@@ -91,9 +105,10 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
 		Name:         "tier2",
-		InterestRate: *big.NewFloat(2),
+		InterestRate: 2,
 		MinAge:       41,
 		MaxAge:       60,
+		ModifiedDate: time.Now(),
 	})
 	if err != nil {
 		log.Println("Error saving default loan condition for tier 3:", err.Error())
@@ -102,9 +117,10 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
 		Name:         "tier2",
-		InterestRate: *big.NewFloat(4),
+		InterestRate: 4,
 		MinAge:       61,
 		MaxAge:       100,
+		ModifiedDate: time.Now(),
 	})
 	if err != nil {
 		log.Println("Error saving default loan condition for tier 4:", err.Error())

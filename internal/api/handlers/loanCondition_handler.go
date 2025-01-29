@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"log"
-	"math/big"
 	"net/http"
 
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
@@ -28,7 +27,7 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 	// Converting dto to entity, there is no need of a automapper here, yet.
 	loanCondition := entities.LoanCondition{
 		Name:         loanConditionDto.Name,
-		InterestRate: *big.NewFloat(loanConditionDto.InterestRate),
+		InterestRate: loanConditionDto.InterestRate,
 		MaxAge:       loanConditionDto.MaxAge,
 		MinAge:       loanConditionDto.MinAge,
 	}

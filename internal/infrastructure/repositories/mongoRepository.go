@@ -30,17 +30,18 @@ func (d *DefaultRepository[T]) SaveItemCollection(itemToSave T) error {
 	return nil
 }
 
-func (d *DefaultRepository[T]) GetItemsCollection(collectionKey string) ([]T, error) {
+func (d *DefaultRepository[T]) GetItemsCollection(itemId string) ([]T, error) {
 	collection := d.Client.Database(d.DatabaseName).Collection(d.CollectionName)
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var filter = bson.M{}
+	log.Printf("databese: %v and collection %v", d.DatabaseName, d.CollectionName)
+
+	var filter = bson.D{}
 	//if there is no key, get all itens
-	if collectionKey != "" {
-		filter = bson.M{"id": collectionKey}
-	}
+	// if itemId != "" {
+	// 	filter = bson.D{{"_id", "itemId"}}
+	// }
 
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
@@ -59,7 +60,6 @@ func (d *DefaultRepository[T]) GetItemsCollection(collectionKey string) ([]T, er
 		}
 		items = append(items, item)
 	}
-
 	return items, nil
 }
 
@@ -104,6 +104,20 @@ func (d *DefaultRepository[T]) Ping() error {
 	err := d.Client.Ping(ctx, nil)
 	if err != nil {
 		log.Printf("Error during ping in DB: %v", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (d *DefaultRepository[T]) TrunkCollection() error {
+	collection := d.Client.Database(d.DatabaseName).Collection(d.CollectionName)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := collection.DeleteMany(ctx, bson.M{})
+	if err != nil {
+		log.Printf("Error during trunk collection in DB: %v", err.Error())
 		return err
 	}
 
