@@ -69,8 +69,9 @@ func (d *DefaultRepository[T]) UpdateItemCollection(collectionItemKey string, fi
 	defer cancel()
 
 	filter := bson.M{"name": collectionItemKey}
-	update := bson.M{}
-
+	update := bson.M{
+		"$set": bson.M{},
+	}
 	for key, value := range fields {
 		update["$set"].(bson.M)[key] = value
 	}

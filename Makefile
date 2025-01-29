@@ -11,3 +11,8 @@ run: build
 test:
 	@echo "Testing..."
 	go test -v ./...
+
+lint:
+	@echo "Linting..."
+	golangci-lint run
+	@echo linter passed!

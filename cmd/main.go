@@ -1,3 +1,8 @@
+// @title Loan Engine API
+// @version 1.0
+// @description This project It's a credit simulator which allows users to consult loan conditions, based in some payments conditions.
+// @host localhost:8080
+// @BasePath /api
 package main
 
 import (
@@ -87,9 +92,11 @@ func main() {
 	}
 	loanCondition_handler := handlers.LoanConditionHandler{
 		LoanCondition_usecase: &loanCondition_usecase,
+		Logger:                log,
 	}
 	loanSimulation_handler := handlers.LoanSimulationHandler{
 		LoanSimulation_usecase: loanSimulation_usecase,
+		Logger:                 log,
 	}
 
 	//Defining the routes
@@ -99,7 +106,7 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Get("/", dafault_handler.HealthCheck)
 
-	router.Route("/loanconditions", func(r chi.Router) {
+	router.Route("/loanconditions/v1", func(r chi.Router) {
 		if useAuth == "true" {
 			r.Use(middlewares.Auth)
 		}
@@ -107,7 +114,7 @@ func main() {
 		r.Get("/", loanCondition_handler.GetLoanConditions)
 	})
 
-	router.Route("/loansimulations", func(r chi.Router) {
+	router.Route("/loansimulations/v1", func(r chi.Router) {
 		if useAuth == "true" {
 			r.Use(middlewares.Auth)
 		}

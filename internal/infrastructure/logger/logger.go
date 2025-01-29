@@ -17,15 +17,33 @@ func LogSetup() *logrus.Logger {
 	// Set the log level (e.g., Info, Warn, Error, Debug)
 	logger.SetLevel(logrus.InfoLevel)
 	logger.SetLevel(logrus.ErrorLevel)
-	logger.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
-			return "", fmt.Sprintf("%s:%d", f.File, f.Line)
-		},
-	})
-
+	logger.SetFormatter(&CustomFormatter{
+        TextFormatter: logrus.TextFormatter{
+            FullTimestamp: true,
+        },
+    })
 	// Enable reporting the caller information
 	logger.SetReportCaller(true)
 
 	return logger
+}
+
+type CustomFormatter struct {
+    logrus.TextFormatter
+}
+func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	timestamp := entry.Time.Format("2006-01-02 15:04:05")
+    _, file, line, ok := runtime.Caller(8)
+    if !ok {
+        file = "unknown"
+        line = 0
+    }
+
+    return []byte(fmt.Sprintf("[%s] %s %s: %s:%d\n",
+        entry.Level.String(),
+        timestamp,
+        entry.Message,
+        file,
+        line,
+    )), nil
 }

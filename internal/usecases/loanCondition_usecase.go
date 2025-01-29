@@ -23,6 +23,8 @@ type LoanCondition_usecase struct {
 }
 
 func (l *LoanCondition_usecase) SetLoanCondition(LoanCondition entities.LoanCondition) error {
+	l.Logger.Info(fmt.Printf("Loan condition to set: %v", LoanCondition))
+
 	fieldsFrom := make(map[string]interface{})
 	fieldsFrom["name"] = LoanCondition.Name
 	fieldsFrom["InterestRate"] = LoanCondition.InterestRate
@@ -49,7 +51,8 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 			l.Logger.Error("Error unmarshalling loan conditions from cache: ", err.Error())
 		}
 
-		l.Logger.Error(fmt.Printf("Loan conditions from cache: %v", loanConditions))
+		l.Logger.Info(fmt.Printf("Loan conditions from cache: %v", loanConditions))
+
 		return loanConditions, nil
 	}
 
