@@ -17,6 +17,12 @@ type LoanConditionHandler struct {
 	Logger                *logrus.Logger
 }
 
+// @Summary update a loan condition by name
+// @Description update a loan condition by name
+// @Tags conditions
+// @Accept  json
+// @Produce  json
+// @Router /loanconditions/v1 [post]
 func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var loanConditionDto dto.LoanConditionRequest_dto
@@ -57,12 +63,11 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 }
 
 // @Summary Show the list of loan conditions, fees by age group
-// @Description Get all articles
+// @Description Get all conditions
 // @Tags conditions
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} Article
-// @Router /loanconditions [get]
+// @Router /loanconditions/v1 [get]
 func (h *LoanConditionHandler) GetLoanConditions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

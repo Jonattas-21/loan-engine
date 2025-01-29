@@ -1,0 +1,43 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This project It's a credit simulator which allows users to consult loan conditions, based in some payments conditions.",
+        "title": "Loan Engine API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/loanconditions/v1": {
+            "get": {
+                "description": "Get all conditions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "conditions"
+                ],
+                "summary": "Show the list of loan conditions, fees by age group",
+                "responses": {}
+            },
+            "post": {
+                "description": "update a loan condition by name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "conditions"
+                ],
+                "summary": "update a loan condition by name",
+                "responses": {}
+            }
+        }
+    }
+}

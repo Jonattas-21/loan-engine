@@ -23,6 +23,9 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/logger"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/repositories"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
+
+	_ "github.com/Jonattas-21/loan-engine/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
@@ -106,7 +109,7 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Get("/", dafault_handler.HealthCheck)
 
-	router.Route("/loanconditions/v1", func(r chi.Router) {
+	router.Route("/api/loanconditions/v1", func(r chi.Router) {
 		if useAuth == "true" {
 			r.Use(middlewares.Auth)
 		}
@@ -114,12 +117,14 @@ func main() {
 		r.Get("/", loanCondition_handler.GetLoanConditions)
 	})
 
-	router.Route("/loansimulations/v1", func(r chi.Router) {
+	router.Route("/api/loansimulations/v1", func(r chi.Router) {
 		if useAuth == "true" {
 			r.Use(middlewares.Auth)
 		}
 		r.Get("/", loanSimulation_handler.GetLoanSimulation)
 	})
+
+	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

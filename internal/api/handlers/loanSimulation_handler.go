@@ -13,6 +13,12 @@ type LoanSimulationHandler struct {
 	Logger                 *logrus.Logger
 }
 
+// @Summary  Get a plenty of loan simulations
+// @Description Get a plenty of loan simulations
+// @Tags simulation
+// @Accept  json
+// @Produce  json
+// @Router /loansimulations/v1 [post]
 func (h *LoanSimulationHandler) GetLoanSimulation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

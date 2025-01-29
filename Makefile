@@ -3,7 +3,7 @@ build:
 	@echo services were built!
 	@golangci-lint run
 	@echo linter passed!
-
+	@echo It's running...
 
 run: build
 	@go run ./cmd/main.go
@@ -16,3 +16,8 @@ lint:
 	@echo "Linting..."
 	golangci-lint run
 	@echo linter passed!
+
+swagger:
+	@echo "Generating swagger..."
+	swag init -g cmd/main.go --parseDependency --parseInternal
+	@echo swagger generated!

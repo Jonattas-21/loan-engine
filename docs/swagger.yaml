@@ -1,0 +1,31 @@
+basePath: /api
+host: localhost:8080
+info:
+  contact: {}
+  description: This project It's a credit simulator which allows users to consult
+    loan conditions, based in some payments conditions.
+  title: Loan Engine API
+  version: "1.0"
+paths:
+  /loanconditions/v1:
+    get:
+      consumes:
+      - application/json
+      description: Get all conditions
+      produces:
+      - application/json
+      responses: {}
+      summary: Show the list of loan conditions, fees by age group
+      tags:
+      - conditions
+    post:
+      consumes:
+      - application/json
+      description: update a loan condition by name
+      produces:
+      - application/json
+      responses: {}
+      summary: update a loan condition by name
+      tags:
+      - conditions
+swagger: "2.0"
