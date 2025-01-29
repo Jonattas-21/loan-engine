@@ -25,3 +25,11 @@ func (r *RedisRepository) Get(key string) (interface{}, error) {
 	}
 	return val, nil
 }
+
+func (r *RedisRepository) Ping() error {
+	_, err := r.Redis.Ping().Result()
+	if err != nil {
+		return err
+	}
+	return nil
+}

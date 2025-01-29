@@ -5,4 +5,5 @@ type Repository[T any] interface {
 	GetItemsCollection(collectionKey string) ([]T, error)
 	DeleteItemCollection(collectionItemKey string) error
 	UpdateItemCollection(collectionItemKey string, fields map[string]interface{}) error
+	Ping() error
 }

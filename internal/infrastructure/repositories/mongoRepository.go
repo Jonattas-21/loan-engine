@@ -96,3 +96,16 @@ func (d *DefaultRepository[T]) DeleteItemCollection(collectionItemKey string) er
 
 	return nil
 }
+
+func (d *DefaultRepository[T]) Ping() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := d.Client.Ping(ctx, nil)
+	if err != nil {
+		log.Println(fmt.Sprintf("Error during ping in DB: %v", err.Error()))
+		return err
+	}
+
+	return nil
+}

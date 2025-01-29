@@ -72,7 +72,11 @@ func main() {
 	}
 
 	//Creating the handlers
-	dafault_handler := handlers.DefaultHandler{}
+	repoDefault := &repositories.DefaultRepository[string]{Client: mdb, DatabaseName: dbName, CollectionName: "default"}
+	dafault_handler := handlers.DefaultHandler{
+		MongoRepo:       repoDefault,
+		CacheRepository: cacheRepo,
+	}
 	loanCondition_handler := handlers.LoanConditionHandler{
 		LoanCondition_usecase: &loanCondition_usecase,
 	}
