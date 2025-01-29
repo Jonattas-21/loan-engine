@@ -23,7 +23,7 @@ type LoanCondition_usecase struct {
 }
 
 func (l *LoanCondition_usecase) SetLoanCondition(LoanCondition entities.LoanCondition) error {
-	l.Logger.Info(fmt.Printf("Loan condition to set: %v", LoanCondition))
+	l.Logger.Infoln(fmt.Printf("Loan condition to set: %v", LoanCondition))
 
 	fieldsFrom := make(map[string]interface{})
 	fieldsFrom["name"] = LoanCondition.Name
@@ -33,7 +33,7 @@ func (l *LoanCondition_usecase) SetLoanCondition(LoanCondition entities.LoanCond
 
 	err := l.LoanConditionRepository.UpdateItemCollection(LoanCondition.Name, fieldsFrom)
 	if err != nil {
-		l.Logger.Error("Error updating loan condition: ", err.Error())
+		l.Logger.Errorln("Error updating loan condition: ", err.Error())
 		return err
 	}
 
@@ -48,19 +48,19 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 	if err == nil {
 		err = json.Unmarshal([]byte(val), &loanConditions)
 		if err != nil {
-			l.Logger.Error("Error unmarshalling loan conditions from cache: ", err.Error())
+			l.Logger.Errorln("Error unmarshalling loan conditions from cache: ", err.Error())
 		}
 
-		l.Logger.Info(fmt.Printf("Loan conditions from cache: %v", loanConditions))
+		l.Logger.Infoln(fmt.Printf("Loan conditions from cache: %v", loanConditions))
 
 		return loanConditions, nil
 	}
 
 	// If we don't have the loan conditions in cache, let's get it from mongoDB
 	conditions, err := l.LoanConditionRepository.GetItemsCollection("loan_conditions")
-	l.Logger.Info(fmt.Printf("Conditions: %v", conditions))
+	l.Logger.Infoln(fmt.Printf("Conditions: %v", conditions))
 	if err != nil {
-		l.Logger.Error("Error getting loan conditions: ", err.Error())
+		l.Logger.Errorln("Error getting loan conditions: ", err.Error())
 		return nil, fmt.Errorf("Error getting loan conditions from mongoDB: %w", err)
 	}
 
@@ -68,16 +68,16 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 		jsonConditions, err := json.Marshal(conditions)
 		// Save in cache, if not, let's just log the error and continue
 		if err != nil {
-			l.Logger.Error("Error marshalling loan conditions: ", err.Error())
+			l.Logger.Errorln("Error marshalling loan conditions: ", err.Error())
 		} else {
 			err = l.CacheRepository.Set("loan_conditions", jsonConditions, time.Minute*10)
 			if err != nil {
-				l.Logger.Error("Error setting loan conditions in cache: ", err.Error())
+				l.Logger.Errorln("Error setting loan conditions in cache: ", err.Error())
 			}
 		}
 	}
 
-	l.Logger.Info(fmt.Printf("Loan conditions from mongoDB: %v", conditions))
+	l.Logger.Infoln(fmt.Printf("Loan conditions from mongoDB: %v", conditions))
 	return conditions, nil
 }
 
@@ -85,7 +85,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 
 	err := l.LoanConditionRepository.TrunkCollection()
 	if err != nil {
-		l.Logger.Error("Error truncating loan conditions collection: ", err.Error())
+		l.Logger.Errorln("Error truncating loan conditions collection: ", err.Error())
 		return fmt.Errorf("Error truncating loan conditions collection: %w", err)
 	}
 
@@ -97,7 +97,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 		ModifiedDate: time.Now(),
 	})
 	if err != nil {
-		l.Logger.Error("Error saving default loan condition for tier 1:", err.Error())
+		l.Logger.Errorln("Error saving default loan condition for tier 1:", err.Error())
 		return fmt.Errorf("Error saving default loan condition for tier 1: %w", err)
 	}
 
@@ -109,7 +109,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 		ModifiedDate: time.Now(),
 	})
 	if err != nil {
-		l.Logger.Error("Error saving default loan condition for tier 2:", err.Error())
+		l.Logger.Errorln("Error saving default loan condition for tier 2:", err.Error())
 		return fmt.Errorf("Error saving default loan condition for tier 2: %w", err)
 	}
 
@@ -121,7 +121,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 		ModifiedDate: time.Now(),
 	})
 	if err != nil {
-		l.Logger.Error("Error saving default loan condition for tier 3:", err.Error())
+		l.Logger.Errorln("Error saving default loan condition for tier 3:", err.Error())
 		return fmt.Errorf("Error saving default loan condition for tier 3: %w", err)
 	}
 
@@ -133,7 +133,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 		ModifiedDate: time.Now(),
 	})
 	if err != nil {
-		l.Logger.Error("Error saving default loan condition for tier 4:", err.Error())
+		l.Logger.Errorln("Error saving default loan condition for tier 4:", err.Error())
 		return fmt.Errorf("Error saving default loan condition for tier 4: %w", err)
 	}
 

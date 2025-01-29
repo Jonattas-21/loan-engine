@@ -28,15 +28,15 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 	var loanConditionDto dto.LoanConditionRequest_dto
 
 	log.Println("Setting loan condition, body is: ", r.Body)
-	h.Logger.Info("Setting loan condition, body is: ", r.Body)
+	h.Logger.Infoln("Setting loan condition, body is: ", r.Body)
 
 	if err := json.NewDecoder(r.Body).Decode(&loanConditionDto); err != nil {
-		h.Logger.Error("Error decoding loan condition: ", err.Error())
+		h.Logger.Errorln("Error decoding loan condition: ", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	h.Logger.Info("Loan condition dto is: ", loanConditionDto)
+	h.Logger.Infoln("Loan condition dto is: ", loanConditionDto)
 	log.Println("Loan condition dto is: ", loanConditionDto)
 
 	// Converting dto to entity, there is no need of a automapper here, yet.
@@ -49,14 +49,14 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 
 	err := h.LoanCondition_usecase.SetLoanCondition(loanCondition)
 	if err != nil {
-		h.Logger.Error("An internal error setting loan condition: ", err.Error())
+		h.Logger.Errorln("An internal error setting loan condition: ", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode("Loan condition set successfully")
 	if err != nil {
-		h.Logger.Error("Error encoding loan condition: ", err.Error())
+		h.Logger.Errorln("Error encoding loan condition: ", err.Error())
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -73,14 +73,14 @@ func (h *LoanConditionHandler) GetLoanConditions(w http.ResponseWriter, r *http.
 
 	conditions, err := h.LoanCondition_usecase.GetLoanConditions()
 	if err != nil {
-		h.Logger.Error("Error getting loan conditions: ", err.Error())
+		h.Logger.Errorln("Error getting loan conditions: ", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode(conditions)
 	if err != nil {
-		h.Logger.Error("Error encoding loan conditions: ", err.Error())
+		h.Logger.Errorln("Error encoding loan conditions: ", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

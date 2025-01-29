@@ -28,4 +28,15 @@ paths:
       summary: update a loan condition by name
       tags:
       - conditions
+  /loansimulations/v1:
+    post:
+      consumes:
+      - application/json
+      description: Get a plenty of loan simulations
+      produces:
+      - application/json
+      responses: {}
+      summary: Get a plenty of loan simulations
+      tags:
+      - simulation
 swagger: "2.0"

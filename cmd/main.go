@@ -34,8 +34,8 @@ func main() {
 	err := godotenv.Load("cmd/.env")
 
 	if err != nil {
-		log.Error("Error loading .env file")
-		panic(err) //todo: search for panic
+		log.Errorln("Error loading .env file")
+		panic(err)
 	}
 
 	//Creating the router
@@ -72,7 +72,7 @@ func main() {
 	//Init the loan conditions tiers
 	err = loanCondition_usecase.InitLoanEngineConditionsData()
 	if err != nil {
-		log.Fatal("Error initializing loan conditions: ", err.Error())
+		log.Fatalln("Error initializing loan conditions: ", err.Error())
 		panic(err)
 	}
 
@@ -126,5 +126,5 @@ func main() {
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatalln(http.ListenAndServe(":8080", router))
 }

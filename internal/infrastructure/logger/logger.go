@@ -15,8 +15,7 @@ func LogSetup() *logrus.Logger {
 	logger.SetOutput(os.Stderr)
 
 	// Set the log level (e.g., Info, Warn, Error, Debug)
-	logger.SetLevel(logrus.InfoLevel)
-	logger.SetLevel(logrus.ErrorLevel)
+	//logger.SetLevel(logrus.InfoLevel)
 	logger.SetFormatter(&CustomFormatter{
         TextFormatter: logrus.TextFormatter{
             FullTimestamp: true,

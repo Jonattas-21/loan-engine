@@ -44,6 +44,22 @@ const docTemplate = `{
                 "summary": "update a loan condition by name",
                 "responses": {}
             }
+        },
+        "/loansimulations/v1": {
+            "post": {
+                "description": "Get a plenty of loan simulations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "simulation"
+                ],
+                "summary": "Get a plenty of loan simulations",
+                "responses": {}
+            }
         }
     }
 }`

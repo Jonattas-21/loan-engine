@@ -24,7 +24,7 @@ func (e *EmailSender) SendMail(subject string, content string, emailsTo ...strin
 
 	err := d.DialAndSend(message)
 	if err != nil {
-		e.Logger.Error("Error sending email: ", err)
+		e.Logger.Errorln("Error sending email: ", err)
 		return err
 	}
 

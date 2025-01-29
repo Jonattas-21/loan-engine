@@ -24,7 +24,7 @@ func (d *DatabaseNosql) NewDatabase() *mongo.Client {
 
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-		d.Logger.Error("Error connecting to the database")
+		d.Logger.Errorln("Error connecting to the database")
 		panic(err)
 	}
 
@@ -37,7 +37,7 @@ func (d *DatabaseNosql) CloseDatabase(client *mongo.Client) {
 
 	err := client.Disconnect(ctx)
 	if err != nil {
-		d.Logger.Error("Error disconnecting from the database")
+		d.Logger.Errorln("Error disconnecting from the database")
 		panic(err)
 	}
 }
