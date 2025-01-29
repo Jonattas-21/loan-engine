@@ -3,11 +3,12 @@ build:
 	@echo services were built!
 	@golangci-lint run
 	@echo linter passed!
-	@echo It's running...
+
 
 run: build
 	@go run ./cmd/main.go
-	@echo app is running!
+	@echo It's running...
+	
 test:
 	@echo "Testing..."
 	go test -v ./...
