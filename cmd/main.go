@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	"github.com/joho/godotenv"
 
 	"github.com/go-chi/chi/v5"
@@ -15,21 +13,22 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/api/middlewares"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/cache"
-		"github.com/Jonattas-21/loan-engine/internal/infrastructure/email"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/database"
+	"github.com/Jonattas-21/loan-engine/internal/infrastructure/email"
+	"github.com/Jonattas-21/loan-engine/internal/infrastructure/logger"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/repositories"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
 )
 
 func main() {
+	//Setting up the logger
+	log := logger.LogSetup()
 	err := godotenv.Load("cmd/.env")
 
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Error("Error loading .env file")
 		panic(err) //todo: search for panic
 	}
-
-	useAuth := os.Getenv("USE_SECURITY")
 
 	//Creating the router
 	router := chi.NewRouter()
@@ -46,35 +45,38 @@ func main() {
 	}))
 
 	//Conecting to the database
+	database := database.DatabaseNosql{Logger: log}
 	mdb := database.NewDatabase()
 	dbName := os.Getenv("MONGO_DB")
 
 	//Conect to Redis cache
 	rdb := cache.NewCache()
-	cacheRepo := &repositories.RedisRepository{Redis: rdb}
+	cacheRepo := &repositories.RedisRepository{Redis: rdb, Logger: log}
 
 	//Creating the condition usecase
-	repoLoanCondition := &repositories.DefaultRepository[entities.LoanCondition]{Client: mdb, DatabaseName: dbName, CollectionName: "loan-conditions"}
+	repoLoanCondition := &repositories.DefaultRepository[entities.LoanCondition]{Client: mdb, DatabaseName: dbName, CollectionName: "loan_conditions"}
 	loanCondition_usecase := usecases.LoanCondition_usecase{
 		LoanConditionRepository: repoLoanCondition,
-		CacheRepository:      cacheRepo,
+		CacheRepository:         cacheRepo,
+		Logger:                  log, //todo: make this a logger interface
 	}
 
 	//Init the loan conditions tiers
-	err= loanCondition_usecase.InitLoanEngineConditionsData()
+	err = loanCondition_usecase.InitLoanEngineConditionsData()
 	if err != nil {
 		log.Fatal("Error initializing loan conditions: ", err.Error())
 		panic(err)
 	}
 
 	//Creating the simulation usecase
-	repoLoanSimulation := &repositories.DefaultRepository[entities.LoanSimulation]{Client: mdb, DatabaseName: dbName, CollectionName: "loan-simulations"}
+	repoLoanSimulation := &repositories.DefaultRepository[entities.LoanSimulation]{Client: mdb, DatabaseName: dbName, CollectionName: "loan_simulations"}
 	emailSender := email.EmailSender{}
 	loanSimulation_usecase := usecases.LoanSimulation_usecase{
 		LoanCondition:            &loanCondition_usecase,
 		LoanSimulationRepository: repoLoanSimulation,
-		CacheRepository:      cacheRepo,
-		EmailSender: 			&emailSender,
+		CacheRepository:          cacheRepo,
+		EmailSender:              &emailSender,
+		Logger:                   log,
 	}
 
 	//Creating the handlers
@@ -91,6 +93,8 @@ func main() {
 	}
 
 	//Defining the routes
+	useAuth := os.Getenv("USE_SECURITY")
+
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Get("/", dafault_handler.HealthCheck)
