@@ -49,7 +49,6 @@ func GetTokenFromKeycloak(username, password string) (*dto.TokenResponse, error)
     data.Set("client_id", os.Getenv("KEYCLOAK_CLIENT_ID"))
     data.Set("username", username)
     data.Set("password", password)
-    //data.Set("scope", "openid")
 
     req, err := http.NewRequest("POST", keycloakURL, strings.NewReader(data.Encode()))
     if err != nil {
