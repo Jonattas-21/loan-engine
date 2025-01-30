@@ -23,18 +23,29 @@ type LoanCondition_usecase struct {
 }
 
 func (l *LoanCondition_usecase) SetLoanCondition(LoanCondition entities.LoanCondition) error {
-	l.Logger.Infoln(fmt.Printf("Loan condition to set: %v", LoanCondition))
-
+	
+	// Update in mongoDB
 	fieldsFrom := make(map[string]interface{})
 	fieldsFrom["name"] = LoanCondition.Name
-	fieldsFrom["InterestRate"] = LoanCondition.InterestRate
-	fieldsFrom["MaxAge"] = LoanCondition.MaxAge
-	fieldsFrom["MinAge"] = LoanCondition.MinAge
+	fieldsFrom["interestrate"] = LoanCondition.InterestRate
+	fieldsFrom["maxage"] = LoanCondition.MaxAge
+	fieldsFrom["minage"] = LoanCondition.MinAge
 
 	err := l.LoanConditionRepository.UpdateItemCollection(LoanCondition.Name, fieldsFrom)
 	if err != nil {
-		l.Logger.Errorln("Error updating loan condition: ", err.Error())
+		l.Logger.Errorln("Error found updating loan condition: ", err.Error())
 		return err
+	}
+
+	// Save in cache, if not, let's just log the error and continue
+	jsonConditions, err := json.Marshal(LoanCondition)
+	if err != nil {
+		l.Logger.Errorln("Error marshalling loan conditions: ", err.Error())
+	} else {
+		err = l.CacheRepository.Set("loan_conditions", jsonConditions, time.Minute*10)
+		if err != nil {
+			l.Logger.Errorln("Error setting loan conditions in cache: ", err.Error())
+		}
 	}
 
 	return nil
@@ -49,11 +60,10 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 		err = json.Unmarshal([]byte(val), &loanConditions)
 		if err != nil {
 			l.Logger.Errorln("Error unmarshalling loan conditions from cache: ", err.Error())
+		} else {
+			l.Logger.Infoln(fmt.Printf("Loan conditions from cache: %v", loanConditions))
+			return loanConditions, nil
 		}
-
-		l.Logger.Infoln(fmt.Printf("Loan conditions from cache: %v", loanConditions))
-
-		return loanConditions, nil
 	}
 
 	// If we don't have the loan conditions in cache, let's get it from mongoDB

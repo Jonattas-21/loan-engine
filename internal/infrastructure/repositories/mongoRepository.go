@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"fmt"
+	"errors"
+
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -38,10 +40,6 @@ func (d *DefaultRepository[T]) GetItemsCollection(itemId string) ([]T, error) {
 	defer cancel()
 
 	var filter = bson.D{}
-	//if there is no key, get all itens
-	// if itemId != "" {
-	// 	filter = bson.D{{"_id", "itemId"}}
-	// }
 
 	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
@@ -76,11 +74,17 @@ func (d *DefaultRepository[T]) UpdateItemCollection(collectionItemKey string, fi
 		update["$set"].(bson.M)[key] = value
 	}
 
-	_, err := collection.UpdateOne(ctx, filter, update)
+	result , err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		d.Logger.Errorln(fmt.Printf("Error during update item in DB: %v", err.Error()))
+		d.Logger.Errorln(fmt.Printf("Error found during update item in DB: %v", err.Error()))
 		return err
 	}
+
+	if result.ModifiedCount == 0 {
+		d.Logger.Errorln(fmt.Printf("Error during update item in DB: %v", "Item not found"))
+		return errors.New("It was not possible to update the item, the item was not found")
+	}
+
 	return nil
 }
 

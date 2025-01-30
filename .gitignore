@@ -5,7 +5,7 @@ cmd.exe
 docs_internal/\[Backend] Case de Código.pdf
 docs_internal/\[SÊNIOR] System Design.pdf
 docs_internal/Como Funciona um Processo de System Design Interview e Como Se Preparar.pdf
-internal/usecases/__debug_bin3396777689.exe
-internal/usecases/__debug_bin1960051238.exe
+# Ignore all .exe files
+*.exe
 cmd/.env
 cmd/.env

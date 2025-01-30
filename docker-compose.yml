@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  loan-app:
+    build: .
+    networks:
+      - loan-network
+    environment:
+      - LOG_LEVEL=info
+    depends_on:
+      - redis
+      - mongo
+      - keycloak
+      # - fluentd
+
+  redis:
+    image: redis:latest
+    networks:
+      - loan-network
+
+  mongo:
+    image: mongo:latest
+    networks:
+      - loan-network
+    volumes:
+      - mongo-data:/data/db
+
+  keycloak:
+    image: jboss/keycloak:latest
+    networks:
+      - loan-network
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+
+  # fluentd:
+  #   image: my-fluentd-image
+  #   networks:
+  #     - loan-network
+  #   ports:
+  #     - "24224:24224"
+  #   volumes:
+  #     - ./fluentd.conf:/fluentd/etc/fluentd.conf
+
+  # elasticsearch:
+  #   image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
+  #   networks:
+  #     - loan-network
+  #   environment:
+  #     - discovery.type=single-node
+  #   ports:
+  #     - "9200:9200"
+  #   volumes:
+  #     - es-data:/usr/share/elasticsearch/data
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   networks:
+  #     - loan-network
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=admin
+
+networks:
+  app-network:
+
+volumes:
+  mongo-data:
+  es-data:

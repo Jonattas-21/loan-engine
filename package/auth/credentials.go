@@ -18,7 +18,7 @@ func ValidationToken(token string, ctx context.Context) (string, error) {
 		return "", errors.New("Error on create provider")
 	}
 
-	verifier := povider.Verifier(&oidc.Config{ClientID: "go-app_users"})
+	verifier := povider.Verifier(&oidc.Config{ClientID: "loan_app"})
 	_, err = verifier.Verify(ctx, token)
 
 	if err != nil {

@@ -6,8 +6,8 @@ build:
 
 
 run: build
-	@go run ./cmd/main.go
 	@echo It's running...
+	@go run ./cmd/main.go
 	
 test:
 	@echo "Testing..."

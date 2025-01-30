@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
-
 	"net/http"
 
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
@@ -27,17 +25,11 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 	w.Header().Set("Content-Type", "application/json")
 	var loanConditionDto dto.LoanConditionRequest_dto
 
-	log.Println("Setting loan condition, body is: ", r.Body)
-	h.Logger.Infoln("Setting loan condition, body is: ", r.Body)
-
 	if err := json.NewDecoder(r.Body).Decode(&loanConditionDto); err != nil {
 		h.Logger.Errorln("Error decoding loan condition: ", err.Error())
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	h.Logger.Infoln("Loan condition dto is: ", loanConditionDto)
-	log.Println("Loan condition dto is: ", loanConditionDto)
 
 	// Converting dto to entity, there is no need of a automapper here, yet.
 	loanCondition := entities.LoanCondition{
@@ -49,7 +41,7 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 
 	err := h.LoanCondition_usecase.SetLoanCondition(loanCondition)
 	if err != nil {
-		h.Logger.Errorln("An internal error setting loan condition: ", err.Error())
+		h.Logger.Errorln("An internal error setting loan condition: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

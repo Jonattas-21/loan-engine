@@ -126,5 +126,5 @@ func main() {
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	log.Fatalln(http.ListenAndServe(":8080", router))
+	log.Fatalln(http.ListenAndServe(":8088", router))
 }
