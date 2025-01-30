@@ -1,10 +1,10 @@
 package usecases
 
 import (
-	//"bytes"
+	"bytes"
 	"encoding/json"
 	"fmt"
-	//"html/template"
+	"html/template"
 	//"log"
 	"math/big"
 	"time"
@@ -31,7 +31,6 @@ type LoanSimulation_usecase struct {
 
 func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanSimulation, error) {
 	var simulationResponses []entities.LoanSimulation
-	var loanSimulation entities.LoanSimulation
 	simulatorChan := make(chan entities.LoanSimulation)
 	errorChan := make(chan error)
 	doneChan := make(chan bool)
@@ -40,6 +39,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 	//todo async
 	for _, simulationRequest := range SimulationRequests {
 		go func(simulationRequest dto.SimulationRequest_dto) {
+			var loanSimulation entities.LoanSimulation
 			keyRedis := fmt.Sprintf("simulation_%v_%v_%v", simulationRequest.Email, simulationRequest.LoanAmount, simulationRequest.Installments)
 
 			//check if the request is in cache
@@ -50,11 +50,11 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 					l.Logger.Errorln(fmt.Sprintf("Error unmarshalling loan simulation from cache from email: %v ", simulationRequest.Email), err.Error())
 				} else {
 					//send email
-					// err = l.sendLoanSimulationEmailMessage(loanSimulation)
-					// if err != nil {
-					// 	//if email fails, let's just log the error and continue
-					// 	l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
-					// }
+					err = l.sendLoanSimulationEmailMessage(loanSimulation)
+					if err != nil {
+						//if email fails, let's just log the error and continue
+						l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
+					}
 					simulatorChan <- loanSimulation
 					return
 				}
@@ -78,31 +78,37 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 				}
 			}
 
+			err = l.LoanSimulationRepository.SaveItemCollection(simulationResponse)
+			if err != nil {
+				l.Logger.Errorln(fmt.Sprintf("Error saving loan simulation from email: %v ", simulationRequest.Email), err.Error())
+				errorChan <- fmt.Errorf("Error saving loan simulation, %v", err.Error())
+			}
+
 			//send email
-			//err = l.sendLoanSimulationEmailMessage(loanSimulation)
-			// if err != nil {
-			// 	//if email fails, let's just log the error and continue
-			// 	l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
-			// }
+			err = l.sendLoanSimulationEmailMessage(loanSimulation)
+			if err != nil {
+				//if email fails, let's just log the error and continue
+				l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
+			}
 			simulatorChan <- simulationResponse
 		}(simulationRequest)
 	}
 
-	 // Collect results
-	 go func() {
-        for i := 0; i < len(SimulationRequests); i++ {
-            select {
-            case res := <-simulatorChan:
-                simulationResponses = append(simulationResponses, res)
-            case err := <-errorChan:
-                l.Logger.Errorln("Error processing simulation:", err)
-            }
-        }
-        doneChan <- true
-    }()
+	// Collect async results
+	go func() {
+		for i := 0; i < len(SimulationRequests); i++ {
+			select {
+			case res := <-simulatorChan:
+				simulationResponses = append(simulationResponses, res)
+			case err := <-errorChan:
+				l.Logger.Errorln("Error processing simulation:", err)
+			}
+		}
+		doneChan <- true
+	}()
 
-    // Wait for completion all the simulations
-    <-doneChan
+	// Wait for completion all the simulations
+	<-doneChan
 
 	return simulationResponses, nil
 }
@@ -150,7 +156,7 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 	l.Logger.Infoln(fmt.Sprintf("onePlusRate %v", onePlusRate))
 
 	// (1 + r)^n
-	ratePower := l.calculatePower(onePlusRate, SimulationRequest.Installments)
+	ratePower := l.CalculatePower(onePlusRate, SimulationRequest.Installments)
 	l.Logger.Infoln(fmt.Sprintf("ratePower %v", ratePower))
 	loanAmountBig := big.NewFloat(SimulationRequest.LoanAmount)
 	l.Logger.Infoln(fmt.Sprintf("loanAmountBig %v", loanAmountBig))
@@ -184,7 +190,7 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 	}, nil
 }
 
-func (l *LoanSimulation_usecase) calculatePower(base *big.Float, exponent int) *big.Float {
+func (l *LoanSimulation_usecase) CalculatePower(base *big.Float, exponent int) *big.Float {
 	result := big.NewFloat(1)
 	for i := 0; i < exponent; i++ {
 		result.Mul(result, base)
@@ -213,28 +219,28 @@ func (l *LoanSimulation_usecase) createInstallments(simulationRequest dto.Simula
 	return returnInstallments
 }
 
-// func (l *LoanSimulation_usecase) sendLoanSimulationEmailMessage(loanSimulation entities.LoanSimulation) error {
+func (l *LoanSimulation_usecase) sendLoanSimulationEmailMessage(loanSimulation entities.LoanSimulation) error {
 
-// 	// Read the template file
-// 	tmpl, err := template.ParseFiles("internal/infrastructure/email/templates/sendLoanSimulation.html") //could be readed on init, one time.
-// 	if err != nil {
-// 		l.Logger.Errorln(fmt.Printf("Error reading email template, %v", err.Error()))
-// 		return fmt.Errorf("Error reading email template, %v", err.Error())
-// 	}
+	// Read the template file
+	tmpl, err := template.ParseFiles("internal/infrastructure/email/templates/sendLoanSimulation.html") //could be readed on init, one time.
+	if err != nil {
+		l.Logger.Errorln(fmt.Printf("Error reading email template, %v", err.Error()))
+		return fmt.Errorf("Error reading email template, %v", err.Error())
+	}
 
-// 	// Generate the HTML content
-// 	var htmlContent bytes.Buffer
-// 	err = tmpl.Execute(&htmlContent, loanSimulation)
-// 	if err != nil {
-// 		l.Logger.Errorln(fmt.Printf("Error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email))
-// 		return fmt.Errorf("Error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email)
-// 	}
+	// Generate the HTML content
+	var htmlContent bytes.Buffer
+	err = tmpl.Execute(&htmlContent, loanSimulation)
+	if err != nil {
+		l.Logger.Errorln(fmt.Printf("Error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email))
+		return fmt.Errorf("Error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email)
+	}
 
-// 	err = l.EmailSender.SendMail(fmt.Sprintf("Loan simulation %v", time.Now().Format("2006-01-02 15:04:05")), htmlContent.String(), loanSimulation.Email)
-// 	if err != nil {
-// 		l.Logger.Errorln(fmt.Printf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email))
-// 		return fmt.Errorf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email)
-// 	}
+	err = l.EmailSender.SendMail(fmt.Sprintf("Loan simulation %v", time.Now().Format("2006-01-02 15:04:05")), htmlContent.String(), loanSimulation.Email)
+	if err != nil {
+		l.Logger.Errorln(fmt.Printf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email))
+		return fmt.Errorf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email)
+	}
 
-// 	return nil
-// }
+	return nil
+}

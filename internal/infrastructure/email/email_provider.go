@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"gopkg.in/gomail.v2"
+	"log"
 )
 
 type EmailSender struct {
-	Logger *logrus.Logger
 }
 
 func (e *EmailSender) SendMail(subject string, content string, emailsTo ...string) error {
 
-	d := gomail.NewDialer(os.Getenv("MAIL_SMTP"), 587, os.Getenv("MAIL_USER"), os.Getenv("MAIL_PASSWORD"))
+	d := gomail.NewDialer(os.Getenv("MAIL_SMTP_HOST"), 587, os.Getenv("MAIL_USER"), os.Getenv("MAIL_PASSWORD"))
+	log.Println("Sending email to: ", emailsTo)
 
 	message := gomail.NewMessage()
 	message.SetHeader("From", os.Getenv("MAIL_USER"))
@@ -23,11 +23,11 @@ func (e *EmailSender) SendMail(subject string, content string, emailsTo ...strin
 	message.SetBody("text/html", content)
 
 	err := d.DialAndSend(message)
+	log.Println("Email sent to: ", emailsTo)
 	if err != nil {
-		e.Logger.Errorln("Error sending email: ", err)
+		log.Println("Error sending email: ", err)
 		return err
 	}
 
 	return nil
-
 }
