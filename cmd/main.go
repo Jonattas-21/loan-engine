@@ -1,7 +1,7 @@
 // @title Loan Engine API
 // @version 1.0
 // @description This project It's a credit simulator which allows users to consult loan conditions, based in some payments conditions.
-// @host localhost:8080
+// @host localhost:8088
 // @BasePath /api
 package main
 
@@ -54,7 +54,9 @@ func main() {
 
 	//Conecting to the database
 	database := database.DatabaseNosql{Logger: log}
+	log.Infoln("Connecting to the database " + os.Getenv("MONGO_HOST"))
 	mdb := database.NewDatabase()
+	log.Infoln("Connected to the database ")
 	dbName := os.Getenv("MONGO_DB")
 
 	//Conect to Redis cache

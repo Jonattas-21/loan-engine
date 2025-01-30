@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/logger"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
@@ -40,7 +41,7 @@ func setupCondition() {
 func TestSetLoanCondition(t *testing.T) {
 	setupCondition()
 	// Define the test loan condition
-	loanCondition := entities.LoanCondition{
+	loanCondition := dto.LoanConditionRequest_dto{
 		Name:         "Test Loan",
 		InterestRate: 5.0,
 		MaxAge:       60,

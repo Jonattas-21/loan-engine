@@ -125,10 +125,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation"
-                            }
+                            "$ref": "#/definitions/github_com_Jonattas-21_loan-engine_internal_api_dto.LoanSimulationResponse_dto"
                         }
                     }
                 }
@@ -136,6 +133,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "github_com_Jonattas-21_loan-engine_internal_api_dto.LoanSimulationResponse_dto": {
+            "type": "object",
+            "properties": {
+                "errorSimulations": {
+                    "type": "array",
+                    "items": {}
+                },
+                "loanSimulations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation"
+                    }
+                }
+            }
+        },
         "github_com_Jonattas-21_loan-engine_internal_api_dto.TokenResponse_dto": {
             "type": "object",
             "properties": {
@@ -231,7 +243,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "localhost:8088",
 	BasePath:         "/api",
 	Schemes:          []string{},
 	Title:            "Loan Engine API",

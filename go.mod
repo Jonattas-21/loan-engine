@@ -1,6 +1,6 @@
 module github.com/Jonattas-21/loan-engine
 
-go 1.23.4
+go 1.23.2
 
 require (
 	github.com/coreos/go-oidc/v3 v3.12.0

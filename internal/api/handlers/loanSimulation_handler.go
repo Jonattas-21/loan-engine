@@ -19,7 +19,7 @@ type LoanSimulationHandler struct {
 // @Tags simulation
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} entities.LoanSimulation
+// @Success 200 {object} dto.LoanSimulationResponse_dto
 // @Router /v1/loansimulations [post]
 func (h *LoanSimulationHandler) GetLoanSimulation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -34,15 +34,14 @@ func (h *LoanSimulationHandler) GetLoanSimulation(w http.ResponseWriter, r *http
 	}
 
 	h.Logger.Infoln("Calculating loan simulation: ", loanSimulationDto)
-	responseSimulation, err := h.LoanSimulation_usecase.GetLoanSimulation(loanSimulationDto)
-	if err != nil {
-		h.Logger.Errorln("An internal error calculating loan: ", err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	responseSimulation, errs := h.LoanSimulation_usecase.GetLoanSimulation(loanSimulationDto)
+
+	reponse := dto.LoanSimulationResponse_dto{
+		LoanSimulations: responseSimulation,
+		ErrorSimulations: errs,
 	}
 
-	h.Logger.Infoln("Loan simulation calculated: ", responseSimulation)
-	err = json.NewEncoder(w).Encode(responseSimulation)
+	err := json.NewEncoder(w).Encode(reponse)
 	if err != nil {
 		h.Logger.Errorln("Error encoding loan simulation: ", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)

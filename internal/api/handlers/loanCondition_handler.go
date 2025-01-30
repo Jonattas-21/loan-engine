@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
-	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
+	_ "github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
 	"github.com/sirupsen/logrus"
 )
@@ -32,15 +32,7 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// Converting dto to entity, there is no need of a automapper here, yet.
-	loanCondition := entities.LoanCondition{
-		Name:         loanConditionDto.Name,
-		InterestRate: loanConditionDto.InterestRate,
-		MaxAge:       loanConditionDto.MaxAge,
-		MinAge:       loanConditionDto.MinAge,
-	}
-
-	err := h.LoanCondition_usecase.SetLoanCondition(loanCondition)
+	err := h.LoanCondition_usecase.SetLoanCondition(loanConditionDto)
 	if err != nil {
 		h.Logger.Errorln("An internal error setting loan condition: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

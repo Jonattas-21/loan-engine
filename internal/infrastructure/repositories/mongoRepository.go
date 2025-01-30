@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"fmt"
-	"errors"
 
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"os"
 )
 
 type DefaultRepository[T any] struct {
@@ -74,16 +74,18 @@ func (d *DefaultRepository[T]) UpdateItemCollection(collectionItemKey string, fi
 		update["$set"].(bson.M)[key] = value
 	}
 
-	result , err := collection.UpdateOne(ctx, filter, update)
+	_ , err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		d.Logger.Errorln(fmt.Printf("Error found during update item in DB: %v", err.Error()))
 		return err
 	}
 
-	if result.ModifiedCount == 0 {
-		d.Logger.Errorln(fmt.Printf("Error during update item in DB: %v", "Item not found"))
-		return errors.New("It was not possible to update the item, the item was not found")
-	}
+	// d.Logger.Errorln("teste = ", result)
+
+	// if result.ModifiedCount == 0 {
+	// 	d.Logger.Errorln(fmt.Printf("Error during update item in DB: %v", "Item not found in collection"))
+	// 	return nil
+	// }
 
 	return nil
 }
@@ -122,7 +124,7 @@ func (d *DefaultRepository[T]) TrunkCollection() error {
 
 	_, err := collection.DeleteMany(ctx, bson.M{})
 	if err != nil {
-		d.Logger.Errorln(fmt.Printf("Error during trunk collection in DB: %v", err.Error()))
+		d.Logger.Errorln(fmt.Printf("Error during trunk collection in DB: %v, server: %v", err.Error(), os.Getenv("MONGO_HOST")))
 		return err
 	}
 

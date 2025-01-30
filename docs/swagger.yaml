@@ -1,5 +1,15 @@
 basePath: /api
 definitions:
+  github_com_Jonattas-21_loan-engine_internal_api_dto.LoanSimulationResponse_dto:
+    properties:
+      errorSimulations:
+        items: {}
+        type: array
+      loanSimulations:
+        items:
+          $ref: '#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation'
+        type: array
+    type: object
   github_com_Jonattas-21_loan-engine_internal_api_dto.TokenResponse_dto:
     properties:
       access_token:
@@ -58,7 +68,7 @@ definitions:
       total_installments:
         type: integer
     type: object
-host: localhost:8080
+host: localhost:8088
 info:
   contact: {}
   description: This project It's a credit simulator which allows users to consult
@@ -139,9 +149,7 @@ paths:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation'
-            type: array
+            $ref: '#/definitions/github_com_Jonattas-21_loan-engine_internal_api_dto.LoanSimulationResponse_dto'
       summary: Get a plenty of loan simulations
       tags:
       - simulation

@@ -18,11 +18,11 @@ This project It's a credit simulator which allows users to consult loan conditio
 ## Instalation
 
 1. Download the Go installer from the [official Go website](https://golang.org/dl/).
-2. RInstall the linter, go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest.
+2. Install the linter, go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest.
 3. Download `make` as part of the project.
 4. Config the .env file, the example is in cmd/env_sample
 
 ### Configuring keycloak
-1. Create a realm
-2. Create a client with 'loan_app' name and client authorization property = off
-3. Create a new user
+1. Create a realm and check the url: KEYCLOAK_HOST="http://localhost:8080/realms/{realmName}" in .env
+2. Create a client with 'loan_app' name and client authorization property = off in advance tab
+3. Create a new user and password

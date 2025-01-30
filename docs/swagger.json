@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "localhost:8088",
     "basePath": "/api",
     "paths": {
         "/": {
@@ -119,10 +119,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation"
-                            }
+                            "$ref": "#/definitions/github_com_Jonattas-21_loan-engine_internal_api_dto.LoanSimulationResponse_dto"
                         }
                     }
                 }
@@ -130,6 +127,21 @@
         }
     },
     "definitions": {
+        "github_com_Jonattas-21_loan-engine_internal_api_dto.LoanSimulationResponse_dto": {
+            "type": "object",
+            "properties": {
+                "errorSimulations": {
+                    "type": "array",
+                    "items": {}
+                },
+                "loanSimulations": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation"
+                    }
+                }
+            }
+        },
         "github_com_Jonattas-21_loan-engine_internal_api_dto.TokenResponse_dto": {
             "type": "object",
             "properties": {

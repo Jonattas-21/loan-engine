@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
   loan-app:
     build: .
+    ports:
+      - "8088:8088"
     networks:
       - loan-network
-    environment:
-      - LOG_LEVEL=info
     depends_on:
       - redis
       - mongo
@@ -17,16 +15,22 @@ services:
     image: redis:latest
     networks:
       - loan-network
+    ports:
+      - "6379:6379"
 
   mongo:
     image: mongo:latest
+    ports:
+      - "27017:27017"
     networks:
       - loan-network
     volumes:
       - mongo-data:/data/db
 
   keycloak:
-    image: jboss/keycloak:latest
+    image: quay.io/keycloak/keycloak:21.1.1
+    ports:
+      - "8080:8080"
     networks:
       - loan-network
     environment:
@@ -63,7 +67,7 @@ services:
   #     - GF_SECURITY_ADMIN_PASSWORD=admin
 
 networks:
-  app-network:
+  loan-network:
 
 volumes:
   mongo-data:

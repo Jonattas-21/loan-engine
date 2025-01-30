@@ -17,7 +17,7 @@ import (
 )
 
 type LoanSimulation interface {
-	GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanCondition, error)
+	GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanCondition, []error)
 	CalculateLoan(SimulationRequest dto.SimulationRequest_dto) (entities.LoanCondition, error)
 	TruncateToTwoDecimals(value float64) float64
 	CalculatePower(base *big.Float, exponent int) *big.Float
@@ -33,8 +33,9 @@ type LoanSimulation_usecase struct {
 	Logger                   *logrus.Logger
 }
 
-func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanSimulation, error) {
+func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanSimulation, []string) {
 	var simulationResponses []entities.LoanSimulation
+	var errorsResponse []string
 	simulatorChan := make(chan entities.LoanSimulation)
 	errorChan := make(chan error)
 	doneChan := make(chan bool)
@@ -44,6 +45,14 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 	for _, simulationRequest := range SimulationRequests {
 		go func(simulationRequest dto.SimulationRequest_dto) {
 			var loanSimulation entities.LoanSimulation
+
+			//validate request
+			errors := l.ValidateSimulationRequest(simulationRequest)
+			if errors != nil {
+				errorChan <- fmt.Errorf("error validating simulation request: %v", errors )
+				return
+			}
+
 			keyRedis := fmt.Sprintf("simulation_%v_%v_%v", simulationRequest.Email, simulationRequest.LoanAmount, simulationRequest.Installments)
 
 			//check if the request is in cache
@@ -67,7 +76,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			//calculate loan if not in cache
 			simulationResponse, err := l.CalculateLoan(simulationRequest)
 			if err != nil {
-				errorChan <- fmt.Errorf("Error calculating loan, %v", err.Error())
+				errorChan <- fmt.Errorf("error calculating loan, %v", err.Error())
 				return
 			}
 
@@ -85,7 +94,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			err = l.LoanSimulationRepository.SaveItemCollection(simulationResponse)
 			if err != nil {
 				l.Logger.Errorln(fmt.Sprintf("Error saving loan simulation from email: %v ", simulationRequest.Email), err.Error())
-				errorChan <- fmt.Errorf("Error saving loan simulation, %v", err.Error())
+				errorChan <- fmt.Errorf("error saving loan simulation, %v", err.Error())
 			}
 
 			//send email
@@ -105,7 +114,9 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			case res := <-simulatorChan:
 				simulationResponses = append(simulationResponses, res)
 			case err := <-errorChan:
-				l.Logger.Errorln("Error processing simulation:", err)
+				errorFormated := fmt.Errorf("error processing simulation: %v for request: %v", err.Error(), SimulationRequests[i])
+				l.Logger.Errorln(errorFormated)
+				errorsResponse = append(errorsResponse, errorFormated.Error())
 			}
 		}
 		doneChan <- true
@@ -114,7 +125,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 	// Wait for completion all the simulations
 	<-doneChan
 
-	return simulationResponses, nil
+	return simulationResponses, errorsResponse
 }
 
 func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationRequest_dto) (entities.LoanSimulation, error) {
@@ -244,6 +255,33 @@ func (l *LoanSimulation_usecase) SendLoanSimulationEmailMessage(loanSimulation e
 	if err != nil {
 		l.Logger.Errorln(fmt.Printf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email))
 		return fmt.Errorf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email)
+	}
+
+	return nil
+}
+
+func (l *LoanSimulation_usecase) ValidateSimulationRequest(SimulationRequest dto.SimulationRequest_dto) []string {
+
+	var errors []string
+
+	if SimulationRequest.BithDate.IsZero() {
+		errors = append(errors, "Birthdate is required")
+	}
+
+	if SimulationRequest.LoanAmount <= 0 {
+		errors = append(errors, "Loan amount is required above 0")
+	}
+
+	if SimulationRequest.Installments <= 0 {
+		errors = append(errors, "Installments is required above 0")
+	}
+
+	if SimulationRequest.Currency != "R$" && SimulationRequest.Currency != "U$" {
+		errors = append(errors, "Currency is required R$ or U$")
+	}
+
+	if len(errors) > 0 {
+		return errors
 	}
 
 	return nil

@@ -6,13 +6,15 @@ import (
 
 	"encoding/json"
 
+	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
 	"github.com/sirupsen/logrus"
+	"strings"
 )
 
 type LoanCondition interface {
-	SetLoanCondition(LoanCondition entities.LoanCondition) error
+	SetLoanCondition(loanConditionDto dto.LoanConditionRequest_dto) error
 	GetLoanConditions() ([]entities.LoanCondition, error)
 }
 
@@ -22,14 +24,32 @@ type LoanCondition_usecase struct {
 	Logger                  *logrus.Logger
 }
 
-func (l *LoanCondition_usecase) SetLoanCondition(LoanCondition entities.LoanCondition) error {
-	
+func (l *LoanCondition_usecase) SetLoanCondition(loanConditionDto dto.LoanConditionRequest_dto) error {
+
+	// Validating loan condition
+	errs := l.ValidadeLoanCondition(loanConditionDto)
+	if errs != nil {
+		l.Logger.Errorln("Error validating loan condition: ", errs)
+		return fmt.Errorf("error validating loan condition: %s", strings.Join(errs, ", "))
+	}
+
+	// Converting dto to entity, there is no need of a automapper here, yet.
+	LoanCondition := entities.LoanCondition{
+		Name:         loanConditionDto.Name,
+		InterestRate: loanConditionDto.InterestRate,
+		MaxAge:       loanConditionDto.MaxAge,
+		MinAge:       loanConditionDto.MinAge,
+	}
+
 	// Update in mongoDB
 	fieldsFrom := make(map[string]interface{})
-	fieldsFrom["name"] = LoanCondition.Name
+
 	fieldsFrom["interestrate"] = LoanCondition.InterestRate
-	fieldsFrom["maxage"] = LoanCondition.MaxAge
-	fieldsFrom["minage"] = LoanCondition.MinAge
+
+	// We can use this way to update all fields, but it's not necessary yet
+	// fieldsFrom["name"] = LoanCondition.Name
+	// fieldsFrom["maxage"] = LoanCondition.MaxAge
+	// fieldsFrom["minage"] = LoanCondition.MinAge
 
 	err := l.LoanConditionRepository.UpdateItemCollection(LoanCondition.Name, fieldsFrom)
 	if err != nil {
@@ -145,6 +165,38 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 	if err != nil {
 		l.Logger.Errorln("Error saving default loan condition for tier 4:", err.Error())
 		return fmt.Errorf("Error saving default loan condition for tier 4: %w", err)
+	}
+
+	return nil
+}
+
+func (l *LoanCondition_usecase) ValidadeLoanCondition(LoanCondition dto.LoanConditionRequest_dto) []string {
+
+	errs := []string{}
+
+	if LoanCondition.InterestRate <= 0 && LoanCondition.InterestRate >= 80 {
+		errs = append(errs, "InterestRate is required above 0 and below 80 per year")
+	}
+
+	// We can use this way to validate all fields, but it's not necessary yet
+	// if LoanCondition.Name == "" {
+	// 	errs = append(errs, "Name is required")
+	// }
+
+	// if LoanCondition.MinAge <= 18 {
+	// 	errs = append(errs, "MinAge is required above 18")
+	// }
+
+	// if LoanCondition.MaxAge >= 120 {
+	// 	errs = append(errs, "MaxAge is required under 120")
+	// }
+
+	// if LoanCondition.MinAge > LoanCondition.MaxAge {
+	// 	errs = append(errs, "MinAge must be less than MaxAge")
+	// }
+
+	if len(errs) > 0 {
+		return errs
 	}
 
 	return nil

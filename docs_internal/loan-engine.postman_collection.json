@@ -12,13 +12,14 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8088/",
+					"raw": "http://localhost:8088/api/",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8088",
 					"path": [
+						"api",
 						""
 					]
 				}
@@ -71,7 +72,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"Name\": \"tier2\",\r\n    \"InterestRate\": 8.5,\r\n    \"MinAge\": 26,\r\n    \"MaxAge\": 40\r\n}",
+					"raw": "{\r\n    \"Name\": \"tier2x\",\r\n    \"InterestRate\": 3,\r\n    \"MinAge\": 26,\r\n    \"MaxAge\": 40\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -116,7 +117,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "[\r\n    {\r\n    \"LoanAmount\": 15000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\",\r\n    \"Email\": \"jonattas-21@hotmail.com\",\r\n    \"Currency\" : \"R$\"\r\n    }, \r\n    {\r\n    \"LoanAmount\": 10000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\",\r\n    \"Email\": \"jonattas-21@hotmail.com\",\r\n    \"Currency\" : \"R$\"\r\n    },\r\n    {\r\n     \"LoanAmount\": 55000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\",\r\n    \"Email\": \"jonattas-21@hotmail.com\",\r\n    \"Currency\" : \"R$\"\r\n    }\r\n]",
+					"raw": "[\r\n    {\r\n    \"LoanAmount\": 15000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\",\r\n    \"Email\": \"jonattas-21@hotmail.com\",\r\n    \"Currency\" : \"R$\"\r\n    },\r\n    {\r\n    \"LoanAmount\": 15000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\"\r\n\r\n    }\r\n\r\n]",
 					"options": {
 						"raw": {
 							"language": "json"
