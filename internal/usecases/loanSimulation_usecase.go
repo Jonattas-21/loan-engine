@@ -19,6 +19,10 @@ import (
 type LoanSimulation interface {
 	GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanCondition, error)
 	CalculateLoan(SimulationRequest dto.SimulationRequest_dto) (entities.LoanCondition, error)
+	TruncateToTwoDecimals(value float64) float64
+	CalculatePower(base *big.Float, exponent int) *big.Float
+	SendLoanSimulationEmailMessage(loanSimulation entities.LoanSimulation) error
+	CreateInstallments(simulationRequest dto.SimulationRequest_dto, installmentValue *big.Float) []entities.Installment
 }
 
 type LoanSimulation_usecase struct {
@@ -50,7 +54,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 					l.Logger.Errorln(fmt.Sprintf("Error unmarshalling loan simulation from cache from email: %v ", simulationRequest.Email), err.Error())
 				} else {
 					//send email
-					err = l.sendLoanSimulationEmailMessage(loanSimulation)
+					err = l.SendLoanSimulationEmailMessage(loanSimulation)
 					if err != nil {
 						//if email fails, let's just log the error and continue
 						l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
@@ -85,7 +89,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			}
 
 			//send email
-			err = l.sendLoanSimulationEmailMessage(loanSimulation)
+			err = l.SendLoanSimulationEmailMessage(loanSimulation)
 			if err != nil {
 				//if email fails, let's just log the error and continue
 				l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
@@ -178,15 +182,15 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 	amountFeeTobePaid := totalAmountTobePaid_float - SimulationRequest.LoanAmount
 
 	return entities.LoanSimulation{
-		LoanAmount:          l.truncateToTwoDecimals(SimulationRequest.LoanAmount),
-		AmountTobePaid:      l.truncateToTwoDecimals(totalAmountTobePaid_float),
-		AmountFeeTobePaid:   l.truncateToTwoDecimals(amountFeeTobePaid),
+		LoanAmount:          l.TruncateToTwoDecimals(SimulationRequest.LoanAmount),
+		AmountTobePaid:      l.TruncateToTwoDecimals(totalAmountTobePaid_float),
+		AmountFeeTobePaid:   l.TruncateToTwoDecimals(amountFeeTobePaid),
 		FeeAmountPercentage: interestRateFloat,
 		TotalInstallments:   SimulationRequest.Installments,
 		SimulationDate:      time.Now(),
 		Currency:            SimulationRequest.Currency,
 		Email:               SimulationRequest.Email,
-		Installments:        l.createInstallments(SimulationRequest, InstallmentValue),
+		Installments:        l.CreateInstallments(SimulationRequest, InstallmentValue),
 	}, nil
 }
 
@@ -198,20 +202,20 @@ func (l *LoanSimulation_usecase) CalculatePower(base *big.Float, exponent int) *
 	return result
 }
 
-func (l *LoanSimulation_usecase) truncateToTwoDecimals(value float64) float64 {
+func (l *LoanSimulation_usecase) TruncateToTwoDecimals(value float64) float64 {
 	factor := math.Pow(10, 2)
 	truncatedValue := math.Trunc(value*factor) / factor
 	return truncatedValue
 }
 
-func (l *LoanSimulation_usecase) createInstallments(simulationRequest dto.SimulationRequest_dto, installmentValue *big.Float) []entities.Installment {
+func (l *LoanSimulation_usecase) CreateInstallments(simulationRequest dto.SimulationRequest_dto, installmentValue *big.Float) []entities.Installment {
 	var returnInstallments []entities.Installment
 	for i := 0; i < simulationRequest.Installments; i++ {
 		installmentValueFloat, _ := installmentValue.Float64()
 		installment := entities.Installment{
 			InstallmentNumber:    i + 1,
-			InstallmentAmount:    l.truncateToTwoDecimals(installmentValueFloat),
-			InstallmentFeeAmount: l.truncateToTwoDecimals(installmentValueFloat), //todo
+			InstallmentAmount:    l.TruncateToTwoDecimals(installmentValueFloat),
+			InstallmentFeeAmount: l.TruncateToTwoDecimals(installmentValueFloat), //todo
 			Currency:             simulationRequest.Currency,
 		}
 		returnInstallments = append(returnInstallments, installment)
@@ -219,7 +223,7 @@ func (l *LoanSimulation_usecase) createInstallments(simulationRequest dto.Simula
 	return returnInstallments
 }
 
-func (l *LoanSimulation_usecase) sendLoanSimulationEmailMessage(loanSimulation entities.LoanSimulation) error {
+func (l *LoanSimulation_usecase) SendLoanSimulationEmailMessage(loanSimulation entities.LoanSimulation) error {
 
 	// Read the template file
 	tmpl, err := template.ParseFiles("internal/infrastructure/email/templates/sendLoanSimulation.html") //could be readed on init, one time.

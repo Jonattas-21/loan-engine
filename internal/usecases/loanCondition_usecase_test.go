@@ -26,7 +26,7 @@ var (
 	}
 )
 
-func setup() {
+func setupCondition() {
 	// Reset the mocks
 	mockConditionDatabaseRepo = new(internalMock.MockRepository[entities.LoanCondition])
 	mockCacheRepo = new(internalMock.MockCacheRepository)
@@ -38,7 +38,7 @@ func setup() {
 }
 
 func TestSetLoanCondition(t *testing.T) {
-	setup()
+	setupCondition()
 	// Define the test loan condition
 	loanCondition := entities.LoanCondition{
 		Name:         "Test Loan",
@@ -65,19 +65,18 @@ func TestSetLoanCondition(t *testing.T) {
 }
 
 func TestGetLoanConditions_db(t *testing.T) {
-	setup()
+	setupCondition()
 	assert := assert.New(t)
 
 	// Define test data
 	loanConditions := []entities.LoanCondition{
-		{Name: "Condition1", InterestRate: 5.0, MaxAge: 60, MinAge: 18},
-		{Name: "Condition2", InterestRate: 4.5, MaxAge: 65, MinAge: 20},
+		{Name: "tier1", InterestRate: 5.0, MaxAge: 60, MinAge: 18},
+		{Name: "tier2", InterestRate: 4.5, MaxAge: 65, MinAge: 20},
 	}
 	jsonConditions, _ := json.Marshal(loanConditions)
 
-	// Test case 2: Loan conditions not in cache, retrieve from database
-	mockCacheRepo.On("Get", "loan_conditions").Return("", fmt.Errorf("not found"))
 	mockConditionDatabaseRepo.On("GetItemsCollection", "loan_conditions").Return(loanConditions, nil)
+	mockCacheRepo.On("Get", "loan_conditions").Return("", fmt.Errorf("not found"))
 	mockCacheRepo.On("Set", "loan_conditions", jsonConditions, time.Minute*10).Return(nil)
 
 	conditions, err := loanConditionUsecase.GetLoanConditions()
@@ -88,7 +87,7 @@ func TestGetLoanConditions_db(t *testing.T) {
 }
 
 func TestGetLoanConditions_cache(t *testing.T) {
-	setup()
+	setupCondition()
 	assert := assert.New(t)
 
 	// Define test data
@@ -108,7 +107,7 @@ func TestGetLoanConditions_cache(t *testing.T) {
 }
 
 func TestInitLoanEngineConditionsData(t *testing.T) {
-	setup()
+	setupCondition()
 	assert := assert.New(t)
 
 	// Set up expected calls and returns
@@ -124,7 +123,7 @@ func TestInitLoanEngineConditionsData(t *testing.T) {
 }
 
 func TestInitLoanEngineConditionsData_Error(t *testing.T) {
-	setup()
+	setupCondition()
 	assert := assert.New(t)
 
 	// Set up expected calls and returns
