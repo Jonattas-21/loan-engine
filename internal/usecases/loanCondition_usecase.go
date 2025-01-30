@@ -124,7 +124,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 	}
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
-		Name:         "tier2",
+		Name:         "tier3",
 		InterestRate: 2,
 		MinAge:       41,
 		MaxAge:       60,
@@ -136,7 +136,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 	}
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
-		Name:         "tier2",
+		Name:         "tier4",
 		InterestRate: 4,
 		MinAge:       61,
 		MaxAge:       100,

@@ -1,0 +1,257 @@
+{
+	"info": {
+		"_postman_id": "77e21ffb-7e85-4e63-9465-7e7592fc01fd",
+		"name": "loan-engine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34415367"
+	},
+	"item": [
+		{
+			"name": "health check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get conditions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJLY1U3Si16czhpemZGLXpqYU93d2MwOVQwTUVKTGZGRy1VMGUyVlBWSkhBIn0.eyJleHAiOjE3MzgyNjIxMjIsImlhdCI6MTczODI2MTIyMiwianRpIjoiYWE1MTE4ZjAtNmI4Ny00ZGM0LWE2NzEtYjFhNTQyYTg4YjkzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9sb2FuLXNpbXVsYXRvciIsInN1YiI6IjM0MjMyMjQ4LTUxZTAtNDgyMy04OThmLWQ4MTQ1MjZkY2ViYiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvYW5fYXBwIiwic2Vzc2lvbl9zdGF0ZSI6ImU4NjJhOGZjLTE1MjktNGMzYi1iZTEzLTBjM2M5ZDJjYTgyNSIsImFjciI6IjEiLCJzY29wZSI6Im9wZW5pZCBlbWFpbCIsInNpZCI6ImU4NjJhOGZjLTE1MjktNGMzYi1iZTEzLTBjM2M5ZDJjYTgyNSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJlbWFpbCI6ImpvbmF0dGFzLTIxQGhvdG1haWwuY29tIn0.MM3rkCgLnWSN6Zrf5yEXu6Byk4YU0thkML2cO1RpPnuzXymKMhYuTp_Eo3lNKlKj18wffaBnroBGQAvJ6FECqvQBrrkKaH4H-2E8A0cZgGgsjEuYjzOozEewjfb8s6Rl2mwnDmyfS6UNREM8YgdeJ1jTaDOKUhow1qbhvSVWF4DX6cfGIrP6FKefe6yO908rjrkzmmdkLpC0oXWETCCzWG1kTiki2bOPRWFVcuqohsUYX46ioBU3gCF5LQm938ATYQPSC6f9ZpR1XjoBAuDLT1hzMtY2f9Orek3W9m9mrzsjinQgtr8dRsW3uaGypxQ0Hb62IzXQvu9ianOaS0u6ow",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8088/api/v1/loanconditions/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"loanconditions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set condition",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJLY1U3Si16czhpemZGLXpqYU93d2MwOVQwTUVKTGZGRy1VMGUyVlBWSkhBIn0.eyJleHAiOjE3MzgyNjIxMjIsImlhdCI6MTczODI2MTIyMiwianRpIjoiYWE1MTE4ZjAtNmI4Ny00ZGM0LWE2NzEtYjFhNTQyYTg4YjkzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9sb2FuLXNpbXVsYXRvciIsInN1YiI6IjM0MjMyMjQ4LTUxZTAtNDgyMy04OThmLWQ4MTQ1MjZkY2ViYiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvYW5fYXBwIiwic2Vzc2lvbl9zdGF0ZSI6ImU4NjJhOGZjLTE1MjktNGMzYi1iZTEzLTBjM2M5ZDJjYTgyNSIsImFjciI6IjEiLCJzY29wZSI6Im9wZW5pZCBlbWFpbCIsInNpZCI6ImU4NjJhOGZjLTE1MjktNGMzYi1iZTEzLTBjM2M5ZDJjYTgyNSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJlbWFpbCI6ImpvbmF0dGFzLTIxQGhvdG1haWwuY29tIn0.MM3rkCgLnWSN6Zrf5yEXu6Byk4YU0thkML2cO1RpPnuzXymKMhYuTp_Eo3lNKlKj18wffaBnroBGQAvJ6FECqvQBrrkKaH4H-2E8A0cZgGgsjEuYjzOozEewjfb8s6Rl2mwnDmyfS6UNREM8YgdeJ1jTaDOKUhow1qbhvSVWF4DX6cfGIrP6FKefe6yO908rjrkzmmdkLpC0oXWETCCzWG1kTiki2bOPRWFVcuqohsUYX46ioBU3gCF5LQm938ATYQPSC6f9ZpR1XjoBAuDLT1hzMtY2f9Orek3W9m9mrzsjinQgtr8dRsW3uaGypxQ0Hb62IzXQvu9ianOaS0u6ow",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"Name\": \"tier2\",\r\n    \"InterestRate\": 8.5,\r\n    \"MinAge\": 26,\r\n    \"MaxAge\": 40\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/loanconditions/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"loanconditions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get simulations",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJLY1U3Si16czhpemZGLXpqYU93d2MwOVQwTUVKTGZGRy1VMGUyVlBWSkhBIn0.eyJleHAiOjE3MzgyNjIxMjIsImlhdCI6MTczODI2MTIyMiwianRpIjoiYWE1MTE4ZjAtNmI4Ny00ZGM0LWE2NzEtYjFhNTQyYTg4YjkzIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9sb2FuLXNpbXVsYXRvciIsInN1YiI6IjM0MjMyMjQ4LTUxZTAtNDgyMy04OThmLWQ4MTQ1MjZkY2ViYiIsInR5cCI6IkJlYXJlciIsImF6cCI6ImxvYW5fYXBwIiwic2Vzc2lvbl9zdGF0ZSI6ImU4NjJhOGZjLTE1MjktNGMzYi1iZTEzLTBjM2M5ZDJjYTgyNSIsImFjciI6IjEiLCJzY29wZSI6Im9wZW5pZCBlbWFpbCIsInNpZCI6ImU4NjJhOGZjLTE1MjktNGMzYi1iZTEzLTBjM2M5ZDJjYTgyNSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJlbWFpbCI6ImpvbmF0dGFzLTIxQGhvdG1haWwuY29tIn0.MM3rkCgLnWSN6Zrf5yEXu6Byk4YU0thkML2cO1RpPnuzXymKMhYuTp_Eo3lNKlKj18wffaBnroBGQAvJ6FECqvQBrrkKaH4H-2E8A0cZgGgsjEuYjzOozEewjfb8s6Rl2mwnDmyfS6UNREM8YgdeJ1jTaDOKUhow1qbhvSVWF4DX6cfGIrP6FKefe6yO908rjrkzmmdkLpC0oXWETCCzWG1kTiki2bOPRWFVcuqohsUYX46ioBU3gCF5LQm938ATYQPSC6f9ZpR1XjoBAuDLT1hzMtY2f9Orek3W9m9mrzsjinQgtr8dRsW3uaGypxQ0Hb62IzXQvu9ianOaS0u6ow",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n    \"LoanAmount\": 15000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\",\r\n    \"Email\": \"jonattas-21@hotmail.com\",\r\n    \"Currency\" : \"R$\"\r\n    }, \r\n    {\r\n    \"LoanAmount\": 10000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\",\r\n    \"Email\": \"jonattas-21@hotmail.com\",\r\n    \"Currency\" : \"R$\"\r\n    },\r\n    {\r\n     \"LoanAmount\": 55000,\r\n    \"Installments\": 24,\r\n    \"BithDate\": \"1990-09-21T15:04:05Z\",\r\n    \"Email\": \"jonattas-21@hotmail.com\",\r\n    \"Currency\" : \"R$\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/loansimulations/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"loansimulations",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth user keycloak",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "loan_app",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "jonattas",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/realms/loan-simulator/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"loan-simulator",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth app",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "loan_app",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "jonattas",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/v1/auth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"v1",
+						"auth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

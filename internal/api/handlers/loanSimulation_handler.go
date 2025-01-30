@@ -18,7 +18,7 @@ type LoanSimulationHandler struct {
 // @Tags simulation
 // @Accept  json
 // @Produce  json
-// @Router /loansimulations/v1 [post]
+// @Router v1/loansimulations [post]
 func (h *LoanSimulationHandler) GetLoanSimulation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
