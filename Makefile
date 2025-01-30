@@ -4,7 +4,6 @@ build:
 	@golangci-lint run
 	@echo linter passed!
 
-
 run: build
 	@echo It's running...
 	@go run ./cmd/main.go
@@ -22,3 +21,6 @@ swagger:
 	@echo "Generating swagger..."
 	swag init -g cmd/main.go --parseDependency --parseInternal
 	@echo swagger generated!
+
+# Access redis:
+# docker exec -it local-redis redis-cli

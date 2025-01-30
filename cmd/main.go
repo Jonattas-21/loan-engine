@@ -107,7 +107,7 @@ func main() {
 
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
-	router.Get("/", dafault_handler.HealthCheck)
+	router.Get("/api/", dafault_handler.HealthCheck)
 
 	router.Route("/api/v1/auth/", func(r chi.Router) {
 		r.Post("/token", dafault_handler.GetToken)
