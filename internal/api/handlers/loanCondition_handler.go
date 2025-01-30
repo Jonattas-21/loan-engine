@@ -16,11 +16,12 @@ type LoanConditionHandler struct {
 }
 
 // @Summary update a loan condition by name
-// @Description update a loan condition by name
+// @Description update a loan condition by name tier1, tier2, tier3, tier4
 // @Tags conditions
 // @Accept  json
 // @Produce  json
-// @Router v1/loanconditions [post]
+// @Success 200 {object} string
+// @Router /v1/loanconditions [post]
 func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var loanConditionDto dto.LoanConditionRequest_dto
@@ -59,7 +60,8 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 // @Tags conditions
 // @Accept  json
 // @Produce  json
-// @Router v1/loanconditions [get]
+// @Success 200 {array} entities.LoanCondition
+// @Router /v1/loanconditions [get]
 func (h *LoanConditionHandler) GetLoanConditions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

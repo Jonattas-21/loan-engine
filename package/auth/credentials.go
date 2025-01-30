@@ -41,7 +41,7 @@ func ValidationToken(token string, ctx context.Context) (string, error) {
 	return email, nil
 }
 
-func GetTokenFromKeycloak(username, password string) (*dto.TokenResponse, error) {
+func GetTokenFromKeycloak(username, password string) (*dto.TokenResponse_dto, error) {
     keycloakURL := os.Getenv("KEYCLOAK_HOST") + "/protocol/openid-connect/token"
 
     data := url.Values{}
@@ -67,7 +67,7 @@ func GetTokenFromKeycloak(username, password string) (*dto.TokenResponse, error)
         return nil, fmt.Errorf("received non-200 response: %d", resp.StatusCode)
     }
 
-    var tokenResponse dto.TokenResponse
+    var tokenResponse dto.TokenResponse_dto
     if err := json.NewDecoder(resp.Body).Decode(&tokenResponse); err != nil {
         return nil, fmt.Errorf("failed to decode response: %w", err)
     }

@@ -6,6 +6,7 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	_"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 )
 
 type LoanSimulationHandler struct {
@@ -18,12 +19,12 @@ type LoanSimulationHandler struct {
 // @Tags simulation
 // @Accept  json
 // @Produce  json
-// @Router v1/loansimulations [post]
+// @Success 200 {array} entities.LoanSimulation
+// @Router /v1/loansimulations [post]
 func (h *LoanSimulationHandler) GetLoanSimulation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	h.Logger.Infoln("Received request to calculate loan simulation: ", r.Body)
-
 	var loanSimulationDto []dto.SimulationRequest_dto
 
 	if err := json.NewDecoder(r.Body).Decode(&loanSimulationDto); err != nil {

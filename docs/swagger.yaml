@@ -1,4 +1,63 @@
 basePath: /api
+definitions:
+  github_com_Jonattas-21_loan-engine_internal_api_dto.TokenResponse_dto:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  github_com_Jonattas-21_loan-engine_internal_domain_entities.Installment:
+    properties:
+      currency:
+        type: string
+      installment_amount:
+        type: number
+      installment_fee_amount:
+        type: number
+      installment_number:
+        type: integer
+    type: object
+  github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanCondition:
+    properties:
+      interest_rate:
+        type: number
+      max_age:
+        type: integer
+      min_age:
+        type: integer
+      modified_date:
+        type: string
+      name:
+        type: string
+    type: object
+  github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation:
+    properties:
+      amount_fee_to_be_paid:
+        type: number
+      amount_to_be_paid:
+        type: number
+      currency:
+        type: string
+      email:
+        type: string
+      fee_amount_percentage:
+        type: number
+      installments:
+        items:
+          $ref: '#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.Installment'
+        type: array
+      loan_amount:
+        type: number
+      simulation_date:
+        type: string
+      total_installments:
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -7,35 +66,82 @@ info:
   title: Loan Engine API
   version: "1.0"
 paths:
-  /loanconditions/v1:
+  /:
+    get:
+      consumes:
+      - application/json
+      description: Check if the application is running and connected to the database
+        and cache
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Check if the application is running
+      tags:
+      - default
+  /v1/auth/token:
+    post:
+      consumes:
+      - application/json
+      description: login in the application and get a token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Jonattas-21_loan-engine_internal_api_dto.TokenResponse_dto'
+      summary: login in the application
+      tags:
+      - default
+  /v1/loanconditions:
     get:
       consumes:
       - application/json
       description: Get all conditions
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanCondition'
+            type: array
       summary: Show the list of loan conditions, fees by age group
       tags:
       - conditions
     post:
       consumes:
       - application/json
-      description: update a loan condition by name
+      description: update a loan condition by name tier1, tier2, tier3, tier4
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
       summary: update a loan condition by name
       tags:
       - conditions
-  /loansimulations/v1:
+  /v1/loansimulations:
     post:
       consumes:
       - application/json
       description: Get a plenty of loan simulations
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/github_com_Jonattas-21_loan-engine_internal_domain_entities.LoanSimulation'
+            type: array
       summary: Get a plenty of loan simulations
       tags:
       - simulation

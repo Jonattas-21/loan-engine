@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	_"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
 	"github.com/Jonattas-21/loan-engine/package/auth"
 )
@@ -21,6 +22,7 @@ type DefaultHandler struct {
 // @Tags default
 // @Accept  json
 // @Produce  json
+// @Success 200 {object} string
 // @Router / [get]
 func (d *DefaultHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 	//ping db and other services
@@ -51,10 +53,11 @@ func (d *DefaultHandler) HealthCheck(w http.ResponseWriter, r *http.Request) {
 
 // @Summary login in the application
 // @Description login in the application and get a token
-// @Tags dafault
+// @Tags default
 // @Accept  json
 // @Produce  json
-// @Router v1/auth/token [post]
+// @Success 200 {object} dto.TokenResponse_dto
+// @Router /v1/auth/token [post]
 func (d *DefaultHandler) GetToken(w http.ResponseWriter, r *http.Request) {
 
 	// Parse form data
