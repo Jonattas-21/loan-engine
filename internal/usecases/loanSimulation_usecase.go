@@ -51,7 +51,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			//validate request
 			errors := l.ValidateSimulationRequest(simulationRequest)
 			if errors != nil {
-				errorChan <- fmt.Errorf("error validating simulation request: %v", errors )
+				errorChan <- fmt.Errorf("[email:%v] error validating simulation request: %v",simulationRequest.Email, errors )
 				return
 			}
 
@@ -62,13 +62,13 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			if err == nil {
 				err = json.Unmarshal([]byte(value), &loanSimulation)
 				if err != nil {
-					l.Logger.Errorln(fmt.Sprintf("Error unmarshalling loan simulation from cache from email: %v ", simulationRequest.Email), err.Error())
+					l.Logger.Errorln(fmt.Sprintf("[email:%v] Error unmarshalling loan simulation from cache", simulationRequest.Email), err.Error())
 				} else {
 					//send email
 					err = l.SendLoanSimulationEmailMessage(loanSimulation)
 					if err != nil {
 						//if email fails, let's just log the error and continue
-						l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
+						l.Logger.Errorln(fmt.Sprintf("[email:%v] Error sending email for loan simulation", simulationRequest.Email), err.Error())
 					}
 					simulatorChan <- loanSimulation
 					return
@@ -78,24 +78,24 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			//calculate loan if not in cache
 			simulationResponse, err := l.CalculateLoan(simulationRequest)
 			if err != nil {
-				errorChan <- fmt.Errorf("error calculating loan, %v", err.Error())
+				errorChan <- fmt.Errorf("[email:%v] error calculating loan, %v", simulationRequest.Email ,err.Error())
 				return
 			}
 
 			// Save in cache, if not, let's just log the error and continue
 			jsonConditions, err := json.Marshal(simulationResponse)
 			if err != nil {
-				l.Logger.Errorln("Error marshalling loan conditions: ", err.Error())
+				l.Logger.Errorln(fmt.Sprintf("[email:%v] error marshalling loan conditions: %v", simulationRequest.Email, err.Error()))
 			} else {
 				err = l.CacheRepository.Set(keyRedis, jsonConditions, time.Minute*5)
 				if err != nil {
-					l.Logger.Errorln(fmt.Sprintf("Error setting loan simulation in cache from email: %v ", simulationRequest.Email), err.Error())
+					l.Logger.Errorln(fmt.Sprintf("[email:%v] error setting loan simulation in cache", simulationRequest.Email), err.Error())
 				}
 			}
 
 			err = l.LoanSimulationRepository.SaveItemCollection(simulationResponse)
 			if err != nil {
-				l.Logger.Errorln(fmt.Sprintf("Error saving loan simulation from email: %v ", simulationRequest.Email), err.Error())
+				l.Logger.Errorln(fmt.Sprintf("[email:%v] Error saving loan simulation", simulationRequest.Email), err.Error())
 				errorChan <- fmt.Errorf("error saving loan simulation, %v", err.Error())
 			}
 
@@ -103,7 +103,7 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 			err = l.SendLoanSimulationEmailMessage(loanSimulation)
 			if err != nil {
 				//if email fails, let's just log the error and continue
-				l.Logger.Errorln(fmt.Sprintf("Error sending email for loan simulation from email: %v ", simulationRequest.Email), err.Error())
+				l.Logger.Errorln(fmt.Sprintf("[email:%v] Error sending email for loan simulation", simulationRequest.Email), err.Error())
 			}
 			simulatorChan <- simulationResponse
 		}(simulationRequest)
