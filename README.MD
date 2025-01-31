@@ -5,15 +5,17 @@ This project It's a credit simulator which allows users to consult loan conditio
 ## Features
 
 - Loan simultor
-- Loan conditions update
-- Loan conditions Search
+- Interest loan conditions update by age group
+- Get all loan age group interest
+- Send email for each loan simulation
 
 ## Technical Componentes
 
-- Authentication, prepared to use keycloak for authentication
+- Authentication, ready to use keycloak for authentication using oAuth 2
 - Caching stategy, to enhance performance while simulating loan or getting the conditions
-- Simulator DB, stores the conditions to calculate the loan and the loan
+- Simulator DB, stores the conditions to calculate the loan and the loan simulated
 - Logging storage, log separeted by level and prepared to quering in elastick search
+- Swagger for api documentation
 
 ## Instalation
 
@@ -21,6 +23,7 @@ This project It's a credit simulator which allows users to consult loan conditio
 2. Install the linter, go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest.
 3. Download `make` as part of the project.
 4. Config the .env file, the example is in cmd/env_sample
+5. >make run
 
 ### Configuring keycloak
 1. Create a realm and check the url: KEYCLOAK_HOST="http://localhost:8080/realms/{realmName}" in .env
