@@ -29,6 +29,11 @@ The system has been splitted in five distinguiguished services to manage each sp
 
 ## Instalation
 
+###pre-requirements
+- Instance of MongoDB
+- Instance of redis
+- (optional) Instance of if Keycloack
+
 1. Download the Go installer from the [official Go website](https://golang.org/dl/).
 2. Install the linter, go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest.
 3. Download `make` as part of the project.
