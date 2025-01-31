@@ -5,15 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+
 	//"log"
 	"math/big"
 	"time"
+
+	"math"
 
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
 	"github.com/sirupsen/logrus"
-	"math"
 )
 
 type LoanSimulation interface {
@@ -31,6 +33,7 @@ type LoanSimulation_usecase struct {
 	EmailSender              interfaces.EmailSender
 	LoanCondition            LoanCondition
 	Logger                   *logrus.Logger
+	QueuePublisher           interfaces.Queue
 }
 
 func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.SimulationRequest_dto) ([]entities.LoanSimulation, []string) {
@@ -111,7 +114,16 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 		for i := 0; i < len(SimulationRequests); i++ {
 			select {
 			case res := <-simulatorChan:
+				//sync response
 				simulationResponses = append(simulationResponses, res)
+
+				//publish in queue, async response
+				// jsonConditions, err := json.Marshal(res)
+				// if err != nil {
+				// 	l.Logger.Errorln("Error marshalling loan conditions: ", err.Error())
+				// }
+				// l.QueuePublisher.PublishMessage(os.Getenv("RABBITMQ_PUBLISH_QUEUE") , string(jsonConditions))
+
 			case err := <-errorChan:
 				errorFormated := fmt.Errorf("error processing simulation: %v for request: %v", err.Error(), SimulationRequests[i])
 				l.Logger.Errorln(errorFormated)

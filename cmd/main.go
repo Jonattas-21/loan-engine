@@ -8,11 +8,12 @@ package main
 import (
 	"github.com/joho/godotenv"
 
+	"net/http"
+	"os"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"net/http"
-	"os"
 
 	"github.com/Jonattas-21/loan-engine/internal/api/handlers"
 	"github.com/Jonattas-21/loan-engine/internal/api/middlewares"
@@ -21,6 +22,7 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/database"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/email"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/logger"
+	"github.com/Jonattas-21/loan-engine/internal/infrastructure/queue"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/repositories"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
 
@@ -78,6 +80,14 @@ func main() {
 		panic(err)
 	}
 
+	//Creating the queue
+	queue := queue.RabbitMQ{Logger: log}
+	// err = queue.CreateQueue(os.Getenv("RABBITMQ_PUBLISH_QUEUE"))
+	// if err != nil {
+	// 	log.Fatalln("Error creating queue: ", err.Error())
+	// 	panic(err)
+	// }
+
 	//Creating the simulation usecase
 	repoLoanSimulation := &repositories.DefaultRepository[entities.LoanSimulation]{Client: mdb, DatabaseName: dbName, CollectionName: "loan_simulations"}
 	emailSender := email.EmailSender{}
@@ -87,6 +97,7 @@ func main() {
 		CacheRepository:          cacheRepo,
 		EmailSender:              &emailSender,
 		Logger:                   log,
+		QueuePublisher:           &queue,
 	}
 
 	//Creating the handlers
