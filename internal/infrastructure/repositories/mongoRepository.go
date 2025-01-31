@@ -19,12 +19,12 @@ type DefaultRepository[T any] struct {
 	Logger         *logrus.Logger
 }
 
+// todo future insert ttl, for some cases of simulations, to delete after some time
 func (d *DefaultRepository[T]) SaveItemCollection(itemToSave T) error {
 	collection := d.Client.Database(d.DatabaseName).Collection(d.CollectionName)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	//todo insert ttl
 	_, err := collection.InsertOne(ctx, itemToSave)
 	if err != nil {
 		d.Logger.Errorln(fmt.Printf("Error during insert item in DB: %v", err.Error()))
@@ -74,18 +74,12 @@ func (d *DefaultRepository[T]) UpdateItemCollection(collectionItemKey string, fi
 		update["$set"].(bson.M)[key] = value
 	}
 
-	_ , err := collection.UpdateOne(ctx, filter, update)
+	_, err := collection.UpdateMany(ctx, filter, update)
+
 	if err != nil {
 		d.Logger.Errorln(fmt.Printf("Error found during update item in DB: %v", err.Error()))
 		return err
 	}
-
-	// d.Logger.Errorln("teste = ", result)
-
-	// if result.ModifiedCount == 0 {
-	// 	d.Logger.Errorln(fmt.Printf("Error during update item in DB: %v", "Item not found in collection"))
-	// 	return nil
-	// }
 
 	return nil
 }

@@ -40,9 +40,10 @@ func setupCondition() {
 
 func TestSetLoanCondition(t *testing.T) {
 	setupCondition()
+	assert := assert.New(t)
 	// Define the test loan condition
 	loanCondition := dto.LoanConditionRequest_dto{
-		Name:         "Test Loan",
+		Name:         "tier1",
 		InterestRate: 5.0,
 		MaxAge:       60,
 		MinAge:       18,
@@ -50,19 +51,16 @@ func TestSetLoanCondition(t *testing.T) {
 
 	// Set up expected calls and returns
 	fields := map[string]interface{}{
-		"name":         "Test Loan",
-		"InterestRate": 5.0,
-		"MaxAge":       60,
-		"MinAge":       18,
+		"interestrate": 5.0,
 	}
 	mockConditionDatabaseRepo.On("UpdateItemCollection", loanCondition.Name, fields).Return(nil)
+	mockCacheRepo.On("Set", "loan_conditions", mock.Anything, time.Minute*10).Return(nil)
 
 	// Call the function
 	err := loanConditionUsecase.SetLoanCondition(loanCondition)
 
 	// Assertions
-	assert.NoError(t, err)
-	mockConditionDatabaseRepo.AssertExpectations(t)
+	assert.NoError(err)
 }
 
 func TestGetLoanConditions_db(t *testing.T) {

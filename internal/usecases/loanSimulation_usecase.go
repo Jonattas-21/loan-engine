@@ -41,7 +41,6 @@ func (l *LoanSimulation_usecase) GetLoanSimulation(SimulationRequests []dto.Simu
 	doneChan := make(chan bool)
 
 	//loop through all simulation requests
-	//todo async
 	for _, simulationRequest := range SimulationRequests {
 		go func(simulationRequest dto.SimulationRequest_dto) {
 			var loanSimulation entities.LoanSimulation
@@ -226,7 +225,7 @@ func (l *LoanSimulation_usecase) CreateInstallments(simulationRequest dto.Simula
 		installment := entities.Installment{
 			InstallmentNumber:    i + 1,
 			InstallmentAmount:    l.TruncateToTwoDecimals(installmentValueFloat),
-			InstallmentFeeAmount: l.TruncateToTwoDecimals(installmentValueFloat), //todo
+			//InstallmentFeeAmount: l.TruncateToTwoDecimals(installmentValueFloat), //todo
 			Currency:             simulationRequest.Currency,
 		}
 		returnInstallments = append(returnInstallments, installment)

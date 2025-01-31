@@ -68,7 +68,7 @@ func main() {
 	loanCondition_usecase := usecases.LoanCondition_usecase{
 		LoanConditionRepository: repoLoanCondition,
 		CacheRepository:         cacheRepo,
-		Logger:                  log, //todo: make this a logger interface
+		Logger:                  log, //todo future: make this a logger interface
 	}
 
 	//Init the loan conditions tiers

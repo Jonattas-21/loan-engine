@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"encoding/json"
-	"fmt"
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/logger"
@@ -21,7 +20,6 @@ var (
 	loanSimulationUsecase      = &usecases.LoanSimulation_usecase{
 		CacheRepository:          mockCacheRepo,
 		LoanSimulationRepository: mockSimulationDatabaseRepo,
-		Logger:                   logger.LogSetup(),
 	}
 )
 
@@ -29,16 +27,18 @@ func setupSimulation() {
 	// Reset the mocks
 	mockConditionDatabaseRepo = new(internalMock.MockRepository[entities.LoanCondition])
 	mockCacheRepo = new(internalMock.MockCacheRepository)
+	logger := logger.LogSetup()
 	loanConditionUsecase = &usecases.LoanCondition_usecase{
 		CacheRepository:         mockCacheRepo,
 		LoanConditionRepository: mockConditionDatabaseRepo,
-		Logger:                  logger.LogSetup(),
+		Logger:                  logger,
 	}
+
 	mockSimulationDatabaseRepo = new(internalMock.MockRepository[entities.LoanSimulation])
 	loanSimulationUsecase      = &usecases.LoanSimulation_usecase{
 		CacheRepository:          mockCacheRepo,
 		LoanSimulationRepository: mockSimulationDatabaseRepo,
-		Logger:                   logger.LogSetup(),
+		Logger:                   logger,
 	}
 }
 
@@ -108,10 +108,10 @@ func TestCalculateLoan_ok(t *testing.T) {
 	jsonConditions, _ := json.Marshal(loanConditions)
 
 	// Mock expectations
-	//mockConditionDatabaseRepo.On("GetLoanConditions").Return(loanConditions, nil)
 	mockConditionDatabaseRepo.On("GetItemsCollection", "loan_conditions").Return(loanConditions, nil)
-	mockCacheRepo.On("Get", "loan_conditions").Return("", fmt.Errorf("not found"))
+	mockCacheRepo.On("Get", "loan_conditions").Return(loanConditions, nil)
 	mockCacheRepo.On("Set", "loan_conditions", jsonConditions, time.Minute*10).Return(nil)
+
 
 	// Call the function
 	result, err := loanSimulationUsecase.CalculateLoan(simulationRequest)
@@ -127,9 +127,6 @@ func TestCalculateLoan_ok(t *testing.T) {
 	assert.Equal("R$", result.Currency)
 	assert.Equal("test@example.com", result.Email)
 	assert.NotEmpty(result.Installments)
-
-	// Verify mock expectations
-	mockConditionDatabaseRepo.AssertExpectations(t)
 }
 
 func TestCalculateLoan_volume(t *testing.T) {

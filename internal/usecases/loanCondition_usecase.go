@@ -91,7 +91,7 @@ func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, e
 	l.Logger.Infoln(fmt.Printf("Conditions: %v", conditions))
 	if err != nil {
 		l.Logger.Errorln("Error getting loan conditions: ", err.Error())
-		return nil, fmt.Errorf("Error getting loan conditions from mongoDB: %w", err)
+		return nil, fmt.Errorf("error getting loan conditions from mongoDB: %w", err)
 	}
 
 	if len(conditions) > 0 {

@@ -16,7 +16,7 @@ type LoanConditionHandler struct {
 }
 
 // @Summary update a loan condition by name
-// @Description update a loan condition by name tier1, tier2, tier3, tier4
+// @Description update a loan condition by name tier1, tier2, tier3, tier4 and for now it's only possible to update the interest rate
 // @Tags conditions
 // @Accept  json
 // @Produce  json
