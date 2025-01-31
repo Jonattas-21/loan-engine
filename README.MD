@@ -12,12 +12,12 @@ This project It's a credit simulator which allows users to consult loan conditio
 ### Activity Diagram
 Bellow folow two use cases that illustrate what it's possible to operate in the system.
 
-![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/activity_diagram.png?token=GHSAT0AAAAAAC5MOQWOEDLPKWOHAJG6SUNGZ44JR6Q "USe Case")
+![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/activity_diagram.png "USe Case")
 
 ### Container Diagram
 The system has been splitted in five distinguiguished services to manage each specific responsability.
 
-![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/topology.png?token=GHSAT0AAAAAAC5MOQWOXL47BLS4JICI7EX6Z44JS5Q "Container Diagram")
+![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/topology.png "Container Diagram")
 
 ## Technical Componentes
 
@@ -29,6 +29,12 @@ The system has been splitted in five distinguiguished services to manage each sp
 
 ## Instalation
 
+### pre-requirements
+> If you are going to run in docker, ensure all the services are runing in the same docker network.
+- Instance of MongoDB
+- Instance of redis
+- (optional) Instance of if Keycloack
+
 1. Download the Go installer from the [official Go website](https://golang.org/dl/).
 2. Install the linter, go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest.
 3. Download `make` as part of the project.
@@ -36,6 +42,7 @@ The system has been splitted in five distinguiguished services to manage each sp
 5. >make run
 
 ### Configuring keycloak
+> Ensure the USE_SECURITY in .env is true, if not, no security middleware will be running.
 1. Create a realm and check the url: KEYCLOAK_HOST="http://localhost:8080/realms/{realmName}" in .env
 2. Create a client with 'loan_app' name and client authorization property = off in advance tab
 3. Create a new user and password
