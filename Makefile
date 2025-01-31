@@ -8,10 +8,6 @@ run: build
 	@echo It's running...
 	@go run ./cmd/main.go
 	
-test:
-	@echo "Testing..."
-	go test -v ./...
-
 lint:
 	@echo "Linting..."
 	golangci-lint run

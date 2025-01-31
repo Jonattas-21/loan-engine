@@ -8,6 +8,7 @@ import (
 	_ "github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
 	"github.com/sirupsen/logrus"
+	"strings"
 )
 
 type LoanConditionHandler struct {
@@ -32,10 +33,19 @@ func (h *LoanConditionHandler) SetLoanCondition(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	err := h.LoanCondition_usecase.SetLoanCondition(loanConditionDto)
+	err, validations := h.LoanCondition_usecase.SetLoanCondition(loanConditionDto)
 	if err != nil {
 		h.Logger.Errorln("An internal error setting loan condition: ", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if validations != nil {
+		err = json.NewEncoder(w).Encode(strings.Join(validations, ", "))
+		if err != nil {
+			h.Logger.Errorln("Error encoding loan condition: ", err.Error())
+		}
+		http.Error(w, "Error setting loan condition", http.StatusBadRequest)
 		return
 	}
 

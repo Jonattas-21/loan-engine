@@ -10,11 +10,11 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
 	"github.com/sirupsen/logrus"
-	"strings"
+	"golang.org/x/exp/slices"
 )
 
 type LoanCondition interface {
-	SetLoanCondition(loanConditionDto dto.LoanConditionRequest_dto) error
+	SetLoanCondition(loanConditionDto dto.LoanConditionRequest_dto) (error, []string)
 	GetLoanConditions() ([]entities.LoanCondition, error)
 }
 
@@ -24,13 +24,13 @@ type LoanCondition_usecase struct {
 	Logger                  *logrus.Logger
 }
 
-func (l *LoanCondition_usecase) SetLoanCondition(loanConditionDto dto.LoanConditionRequest_dto) error {
+func (l *LoanCondition_usecase) SetLoanCondition(loanConditionDto dto.LoanConditionRequest_dto) (error, []string) {
 
 	// Validating loan condition
 	errs := l.ValidadeLoanCondition(loanConditionDto)
 	if errs != nil {
 		l.Logger.Errorln("Error validating loan condition: ", errs)
-		return fmt.Errorf("error validating loan condition: %s", strings.Join(errs, ", "))
+		return nil, errs
 	}
 
 	// Converting dto to entity, there is no need of a automapper here, yet.
@@ -54,7 +54,7 @@ func (l *LoanCondition_usecase) SetLoanCondition(loanConditionDto dto.LoanCondit
 	err := l.LoanConditionRepository.UpdateItemCollection(LoanCondition.Name, fieldsFrom)
 	if err != nil {
 		l.Logger.Errorln("Error found updating loan condition: ", err.Error())
-		return err
+		return err, nil
 	}
 
 	// Save in cache, if not, let's just log the error and continue
@@ -68,7 +68,7 @@ func (l *LoanCondition_usecase) SetLoanCondition(loanConditionDto dto.LoanCondit
 		}
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (l *LoanCondition_usecase) GetLoanConditions() ([]entities.LoanCondition, error) {
@@ -174,15 +174,17 @@ func (l *LoanCondition_usecase) ValidadeLoanCondition(LoanCondition dto.LoanCond
 
 	errs := []string{}
 
-	if LoanCondition.InterestRate <= 0 && LoanCondition.InterestRate >= 80 {
+	if LoanCondition.InterestRate <= 0 || LoanCondition.InterestRate >= 80 {
 		errs = append(errs, "InterestRate is required above 0 and below 80 per year")
 	}
 
-	// We can use this way to validate all fields, but it's not necessary yet
-	// if LoanCondition.Name == "" {
-	// 	errs = append(errs, "Name is required")
-	// }
+	tierNames := []string{"tier1", "tier2", "tier3", "tier4"}
 
+	if LoanCondition.Name == "" || !slices.Contains(tierNames, LoanCondition.Name) {
+		errs = append(errs, "Name is required and must be one of the following: tier1, tier2, tier3, tier4")
+	}
+
+	// We can use this way to validate all fields, but it's not necessary yet
 	// if LoanCondition.MinAge <= 18 {
 	// 	errs = append(errs, "MinAge is required above 18")
 	// }

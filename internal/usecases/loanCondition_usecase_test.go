@@ -57,10 +57,11 @@ func TestSetLoanCondition(t *testing.T) {
 	mockCacheRepo.On("Set", "loan_conditions", mock.Anything, time.Minute*10).Return(nil)
 
 	// Call the function
-	err := loanConditionUsecase.SetLoanCondition(loanCondition)
+	err, validations := loanConditionUsecase.SetLoanCondition(loanCondition)
 
 	// Assertions
 	assert.NoError(err)
+	assert.Nil(validations)
 }
 
 func TestGetLoanConditions_db(t *testing.T) {

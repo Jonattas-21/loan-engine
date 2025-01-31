@@ -28,6 +28,11 @@ import (
 
 	_ "github.com/Jonattas-21/loan-engine/docs"
 	httpSwagger "github.com/swaggo/http-swagger"
+
+	"context"
+
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -143,5 +148,38 @@ func main() {
 
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	log.Fatalln(http.ListenAndServe(":8088", router))
+	// Create context with cancel function
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Listen for shutdown signals
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+		<-c
+		log.Infoln("Shutting down server...")
+
+		// Close connections
+		_ = mdb.Disconnect(ctx)
+		_ = rdb.Close()
+
+		log.Infoln("Database and cache connections are closed.")
+		cancel()
+	}()
+
+	// Run the serverb
+	server := &http.Server{
+		Addr:    ":8088",
+		Handler: router,
+	}
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	log.Infoln("Server running...")
+
+	// Wait for the context to be canceled (shutdown signal received)
+	<-ctx.Done()
+	log.Infoln("Server stopped.")
 }

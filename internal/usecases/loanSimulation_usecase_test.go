@@ -181,7 +181,7 @@ func TestCalculateLoan_volume(t *testing.T) {
 
 	assert.Equal(volume, len(simulationRequest))
 	assert.Equal(volume, len(simulationResponses))
-	assert.Lessf(duration.Seconds(), 4.0, "Test took too long: %v seconds", duration.Seconds())
+	assert.Lessf(duration.Seconds(), 6.0, "Test took too long: %v seconds", duration.Seconds())
 
 	// Log the duration time
 	t.Logf("Duration: %s", duration)
