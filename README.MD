@@ -30,6 +30,7 @@ The system has been splitted in five distinguiguished services to manage each sp
 ## Instalation
 
 ### pre-requirements
+> If you are going to run in docker, ensure all the services are runing in the same docker network.
 - Instance of MongoDB
 - Instance of redis
 - (optional) Instance of if Keycloack
@@ -41,6 +42,7 @@ The system has been splitted in five distinguiguished services to manage each sp
 5. >make run
 
 ### Configuring keycloak
+> Ensure the USE_SECURITY in .env is true, if not, no security middleware will be running.
 1. Create a realm and check the url: KEYCLOAK_HOST="http://localhost:8080/realms/{realmName}" in .env
 2. Create a client with 'loan_app' name and client authorization property = off in advance tab
 3. Create a new user and password
