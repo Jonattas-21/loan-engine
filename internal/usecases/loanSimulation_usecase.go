@@ -132,7 +132,7 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 	conditions, err := l.LoanCondition.GetLoanConditions()
 	if err != nil {
 		l.Logger.Errorln(fmt.Printf("Error getting loan conditions, %v", err.Error()))
-		return entities.LoanSimulation{}, fmt.Errorf("Error getting loan conditions, %v", err.Error())
+		return entities.LoanSimulation{}, fmt.Errorf("error getting loan conditions, %v", err.Error())
 	}
 
 	//calculate age
@@ -155,7 +155,7 @@ func (l *LoanSimulation_usecase) CalculateLoan(SimulationRequest dto.SimulationR
 	//check if interest rate was found
 	interestRateFloat, _ := interestRate.Float64()
 	if interestRateFloat == 0 {
-		return entities.LoanSimulation{}, fmt.Errorf("Interest rate not found for age %v", age)
+		return entities.LoanSimulation{}, fmt.Errorf("interest rate not found for age %v", age)
 	}
 
 	l.Logger.Infoln(fmt.Sprintf("input fro calc: rate %v, age %v, instalmentsN %v, pv %v", interestRateFloat, age, SimulationRequest.Installments, SimulationRequest.LoanAmount))
@@ -239,7 +239,7 @@ func (l *LoanSimulation_usecase) SendLoanSimulationEmailMessage(loanSimulation e
 	tmpl, err := template.ParseFiles("internal/infrastructure/email/templates/sendLoanSimulation.html") //could be readed on init, one time.
 	if err != nil {
 		l.Logger.Errorln(fmt.Printf("Error reading email template, %v", err.Error()))
-		return fmt.Errorf("Error reading email template, %v", err.Error())
+		return fmt.Errorf("error reading email template, %v", err.Error())
 	}
 
 	// Generate the HTML content
@@ -247,13 +247,13 @@ func (l *LoanSimulation_usecase) SendLoanSimulationEmailMessage(loanSimulation e
 	err = tmpl.Execute(&htmlContent, loanSimulation)
 	if err != nil {
 		l.Logger.Errorln(fmt.Printf("Error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email))
-		return fmt.Errorf("Error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email)
+		return fmt.Errorf("error executing email template, %v, simulation for email %v", err.Error(), loanSimulation.Email)
 	}
 
 	err = l.EmailSender.SendMail(fmt.Sprintf("Loan simulation %v", time.Now().Format("2006-01-02 15:04:05")), htmlContent.String(), loanSimulation.Email)
 	if err != nil {
 		l.Logger.Errorln(fmt.Printf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email))
-		return fmt.Errorf("Error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email)
+		return fmt.Errorf("error sending email, %v, simulation for email %v", err.Error(), loanSimulation.Email)
 	}
 
 	return nil

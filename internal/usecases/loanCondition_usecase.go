@@ -116,7 +116,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 	err := l.LoanConditionRepository.TrunkCollection()
 	if err != nil {
 		l.Logger.Errorln("Error truncating loan conditions collection: ", err.Error())
-		return fmt.Errorf("Error truncating loan conditions collection: %w", err)
+		return fmt.Errorf("error truncating loan conditions collection: %w", err)
 	}
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
@@ -140,7 +140,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 	})
 	if err != nil {
 		l.Logger.Errorln("Error saving default loan condition for tier 2:", err.Error())
-		return fmt.Errorf("Error saving default loan condition for tier 2: %w", err)
+		return fmt.Errorf("error saving default loan condition for tier 2: %w", err)
 	}
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
@@ -152,7 +152,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 	})
 	if err != nil {
 		l.Logger.Errorln("Error saving default loan condition for tier 3:", err.Error())
-		return fmt.Errorf("Error saving default loan condition for tier 3: %w", err)
+		return fmt.Errorf("error saving default loan condition for tier 3: %w", err)
 	}
 
 	err = l.LoanConditionRepository.SaveItemCollection(entities.LoanCondition{
@@ -164,7 +164,7 @@ func (l *LoanCondition_usecase) InitLoanEngineConditionsData() error {
 	})
 	if err != nil {
 		l.Logger.Errorln("Error saving default loan condition for tier 4:", err.Error())
-		return fmt.Errorf("Error saving default loan condition for tier 4: %w", err)
+		return fmt.Errorf("error saving default loan condition for tier 4: %w", err)
 	}
 
 	return nil

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"encoding/json"
+	"fmt"
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/infrastructure/logger"
@@ -20,6 +21,8 @@ var (
 	loanSimulationUsecase      = &usecases.LoanSimulation_usecase{
 		CacheRepository:          mockCacheRepo,
 		LoanSimulationRepository: mockSimulationDatabaseRepo,
+		LoanCondition:            loanConditionUsecase,
+		Logger:                   logger.LogSetup(),
 	}
 )
 
@@ -35,13 +38,13 @@ func setupSimulation() {
 	}
 
 	mockSimulationDatabaseRepo = new(internalMock.MockRepository[entities.LoanSimulation])
-	loanSimulationUsecase      = &usecases.LoanSimulation_usecase{
+	loanSimulationUsecase = &usecases.LoanSimulation_usecase{
 		CacheRepository:          mockCacheRepo,
 		LoanSimulationRepository: mockSimulationDatabaseRepo,
 		Logger:                   logger,
+		LoanCondition:            loanConditionUsecase,
 	}
 }
-
 
 func TestCalculatePower_ok(t *testing.T) {
 	assert := assert.New(t)
@@ -109,9 +112,8 @@ func TestCalculateLoan_ok(t *testing.T) {
 
 	// Mock expectations
 	mockConditionDatabaseRepo.On("GetItemsCollection", "loan_conditions").Return(loanConditions, nil)
-	mockCacheRepo.On("Get", "loan_conditions").Return(loanConditions, nil)
+	mockCacheRepo.On("Get", "loan_conditions").Return(string(jsonConditions), nil)
 	mockCacheRepo.On("Set", "loan_conditions", jsonConditions, time.Minute*10).Return(nil)
-
 
 	// Call the function
 	result, err := loanSimulationUsecase.CalculateLoan(simulationRequest)
@@ -131,12 +133,16 @@ func TestCalculateLoan_ok(t *testing.T) {
 
 func TestCalculateLoan_volume(t *testing.T) {
 	assert := assert.New(t)
-	setupCondition()
+	setupSimulation()
+	volume := 10000
+
+	// Start timing
+	startTime := time.Now()
 
 	// Define test data
 	simulationRequest := []dto.SimulationRequest_dto{}
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < volume; i++ {
 		randInstallmentNumber := rand.Intn(48-12+1) + 12
 		rendLoanValue := 1000 + rand.Float64()*(50000-1000)
 
@@ -154,14 +160,29 @@ func TestCalculateLoan_volume(t *testing.T) {
 	}
 
 	// Mock expectations
-	mockConditionDatabaseRepo.On("GetLoanConditions").Return(loanConditions, nil)
-	mockSimulationDatabaseRepo.On("SendLoanSimulationEmailMessage").Return(nil)
+	jsonConditions, _ := json.Marshal(loanConditions)
+	mockConditionDatabaseRepo.On("GetItemsCollection", "loan_conditions").Return(loanConditions, nil)
+	mockCacheRepo.On("Get", "loan_conditions").Return("", fmt.Errorf("not found"))
+	mockCacheRepo.On("Set", "loan_conditions", jsonConditions, time.Minute*10).Return(nil)
+
+	simulationResponses := []entities.LoanSimulation{}
 
 	// Call the function
 	for _, request := range simulationRequest {
 		result, err := loanSimulationUsecase.CalculateLoan(request)
+		simulationResponses = append(simulationResponses, result)
 		assert.NoError(err)
 		assert.NotNil(result)
 		assert.NotEmpty(result.Installments)
 	}
+
+	// End timing
+	duration := time.Since(startTime)
+
+	assert.Equal(volume, len(simulationRequest))
+	assert.Equal(volume, len(simulationResponses))
+	assert.Lessf(duration.Seconds(), 4.0, "Test took too long: %v seconds", duration.Seconds())
+
+	// Log the duration time
+	t.Logf("Duration: %s", duration)
 }

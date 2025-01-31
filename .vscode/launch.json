@@ -11,10 +11,24 @@
             "mode": "debug",
             "program": "cmd/main.go",
             "env": {
-                "DLV_TRACE": "true",
-                "DLV_LOG": "true",
-                "DLV_LOG_OUTPUT": "debugger,rpc"
-            }
+                "GOROOT": "C:/Program Files/Go",
+                "GOPATH": "C:/Users/Jonat/go"
+            },
+        },
+        {
+            "name": "Attach",
+            "type": "go",
+            "request": "attach",
+            "mode": "local",
+            "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "Connect to Delve",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "host": "127.0.0.1",
+            "port": 2345
         }
     ]
 }
