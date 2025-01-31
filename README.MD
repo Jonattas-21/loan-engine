@@ -12,12 +12,12 @@ This project It's a credit simulator which allows users to consult loan conditio
 ### Activity Diagram
 Bellow folow two use cases that illustrate what it's possible to operate in the system.
 
-![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/activity_diagram.png?token=GHSAT0AAAAAAC5MOQWOEDLPKWOHAJG6SUNGZ44JR6Q "USe Case")
+![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/activity_diagram.png "USe Case")
 
 ### Container Diagram
 The system has been splitted in five distinguiguished services to manage each specific responsability.
 
-![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/topology.png?token=GHSAT0AAAAAAC5MOQWOXL47BLS4JICI7EX6Z44JS5Q "Container Diagram")
+![alt text](https://raw.githubusercontent.com/Jonattas-21/loan-engine/refs/heads/main/docs_internal/topology.png "Container Diagram")
 
 ## Technical Componentes
 
@@ -29,7 +29,7 @@ The system has been splitted in five distinguiguished services to manage each sp
 
 ## Instalation
 
-###pre-requirements
+### pre-requirements
 - Instance of MongoDB
 - Instance of redis
 - (optional) Instance of if Keycloack
