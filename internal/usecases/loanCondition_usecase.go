@@ -9,7 +9,6 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/exp/slices"
 )
 
@@ -21,7 +20,7 @@ type LoanCondition interface {
 type LoanCondition_usecase struct {
 	LoanConditionRepository interfaces.Repository[entities.LoanCondition]
 	CacheRepository         interfaces.CacheRepository
-	Logger                  *logrus.Logger
+	Logger                  interfaces.Log
 }
 
 func (l *LoanCondition_usecase) SetLoanCondition(loanConditionDto dto.LoanConditionRequest_dto) (error, []string) {

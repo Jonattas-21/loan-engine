@@ -2,16 +2,17 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/Jonattas-21/loan-engine/internal/api/dto"
-	"github.com/Jonattas-21/loan-engine/internal/usecases"
-	"github.com/sirupsen/logrus"
 	"net/http"
-	_"github.com/Jonattas-21/loan-engine/internal/domain/entities"
+
+	"github.com/Jonattas-21/loan-engine/internal/api/dto"
+	_ "github.com/Jonattas-21/loan-engine/internal/domain/entities"
+	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
+	"github.com/Jonattas-21/loan-engine/internal/usecases"
 )
 
 type LoanSimulationHandler struct {
 	LoanSimulation_usecase usecases.LoanSimulation_usecase
-	Logger                 *logrus.Logger
+	Logger                 interfaces.Log
 }
 
 // @Summary  Get a plenty of loan simulations

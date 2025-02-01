@@ -27,15 +27,15 @@ services:
     volumes:
       - mongo-data:/data/db
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:21.1.1
-    ports:
-      - "8080:8080"
-    networks:
-      - loan-network
-    environment:
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin
+  # keycloak:
+  #   image: quay.io/keycloak/keycloak:21.1.1
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - loan-network
+  #   environment:
+  #     - KEYCLOAK_USER=admin
+  #     - KEYCLOAK_PASSWORD=admin
 
   # fluentd:
   #   image: my-fluentd-image

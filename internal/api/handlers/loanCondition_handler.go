@@ -7,13 +7,13 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	_ "github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/usecases"
-	"github.com/sirupsen/logrus"
+	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
 	"strings"
 )
 
 type LoanConditionHandler struct {
 	LoanCondition_usecase usecases.LoanCondition
-	Logger                *logrus.Logger
+	Logger                interfaces.Log
 }
 
 // @Summary update a loan condition by name

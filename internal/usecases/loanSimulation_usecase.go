@@ -5,8 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-
-	//"log"
 	"math/big"
 	"time"
 
@@ -15,7 +13,6 @@ import (
 	"github.com/Jonattas-21/loan-engine/internal/api/dto"
 	"github.com/Jonattas-21/loan-engine/internal/domain/entities"
 	"github.com/Jonattas-21/loan-engine/internal/domain/interfaces"
-	"github.com/sirupsen/logrus"
 )
 
 type LoanSimulation interface {
@@ -32,7 +29,7 @@ type LoanSimulation_usecase struct {
 	CacheRepository          interfaces.CacheRepository
 	EmailSender              interfaces.EmailSender
 	LoanCondition            LoanCondition
-	Logger                   *logrus.Logger
+	Logger                   interfaces.Log
 	QueuePublisher           interfaces.Queue
 }
 
