@@ -1,0 +1,13 @@
+Todo list:
+------------------------------------------------
+
+1) Logs configuration
+    * FluentD configuration
+    * Elastic search container in docker compose
+    * Grafana container and configuration in docker compose
+
+2) Docker compose working 100%
+
+3) Logic to save fee dynamically
+
+4) Create curls to setup keycloak in docker compose
